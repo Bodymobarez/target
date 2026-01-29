@@ -1,5 +1,29 @@
 import type { Product, Category } from "@shared/types";
 
+// صور حقيقية من Unsplash لكل فئة منتج
+const IMG = {
+  iphone: "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=800&h=800&fit=crop",
+  iphone2: "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=800&h=800&fit=crop",
+  macbook: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&h=800&fit=crop",
+  macbook2: "https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=800&h=800&fit=crop",
+  ipad: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=800&h=800&fit=crop",
+  ipad2: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&h=800&fit=crop",
+  watch: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&h=800&fit=crop",
+  watch2: "https://images.unsplash.com/photo-1434493789847-2f02dc6ca35d?w=800&h=800&fit=crop",
+  airpods: "https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=800&h=800&fit=crop",
+  airpods2: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&h=800&fit=crop",
+  airpodsMax: "https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=800&h=800&fit=crop",
+  imac: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=800&h=800&fit=crop",
+  appletv: "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=800&h=800&fit=crop",
+  charger: "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=800&h=800&fit=crop",
+  cable: "https://images.unsplash.com/photo-1625726411847-7c2ea23db30b?w=800&h=800&fit=crop",
+  case: "https://images.unsplash.com/photo-1601593346742-7a179b641c2d?w=800&h=800&fit=crop",
+  keyboard: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800&h=800&fit=crop",
+  pencil: "https://images.unsplash.com/photo-1624823183494-4d711f2f1a6c?w=800&h=800&fit=crop",
+  airtag: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=800&fit=crop",
+  remote: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=800&h=800&fit=crop",
+} as const;
+
 export const categories: Category[] = [
   { id: "iphone", name: "iPhone", slug: "iphone", description: "Powerful. Beautiful.", productCount: 5, image: "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=600&h=600&fit=crop" },
   { id: "ipad", name: "iPad", slug: "ipad", description: "Magic happens here.", productCount: 3, image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=600&h=600&fit=crop" },
@@ -23,7 +47,7 @@ export const products: Product[] = [
     shortDescription: "A17 Pro. 48MP. Titanium.",
     price: 1199,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=800&h=800&fit=crop"],
+    images: [IMG.iphone],
     rating: 4.8,
     reviewCount: 2847,
     specs: [
@@ -53,7 +77,7 @@ export const products: Product[] = [
     shortDescription: "Titanium. So Pro.",
     price: 999,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=800&h=800&fit=crop"],
+    images: [IMG.iphone2],
     rating: 4.7,
     reviewCount: 1923,
     specs: [
@@ -81,7 +105,7 @@ export const products: Product[] = [
     shortDescription: "Dynamic Island. 48MP.",
     price: 799,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=800&h=800&fit=crop"],
+    images: [IMG.iphone],
     rating: 4.6,
     reviewCount: 3456,
     specs: [
@@ -109,7 +133,7 @@ export const products: Product[] = [
     shortDescription: "All-day battery. 12MP.",
     price: 699,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=800&h=800&fit=crop"],
+    images: [IMG.iphone2],
     rating: 4.5,
     reviewCount: 4123,
     specs: [
@@ -136,7 +160,7 @@ export const products: Product[] = [
     shortDescription: "Powerful. Compact.",
     price: 429,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=800&h=800&fit=crop"],
+    images: [IMG.iphone],
     rating: 4.4,
     reviewCount: 2876,
     specs: [
@@ -162,7 +186,7 @@ export const products: Product[] = [
     shortDescription: "M3 Pro or M3 Max. Pro display.",
     price: 2499,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&h=800&fit=crop"],
+    images: [IMG.macbook],
     rating: 4.9,
     reviewCount: 1342,
     specs: [
@@ -188,7 +212,7 @@ export const products: Product[] = [
     shortDescription: "M3 Pro. Pro display.",
     price: 1999,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&h=800&fit=crop"],
+    images: [IMG.macbook],
     rating: 4.9,
     reviewCount: 2156,
     specs: [
@@ -212,7 +236,7 @@ export const products: Product[] = [
     shortDescription: "Thin. M3. 15-inch.",
     price: 1299,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&h=800&fit=crop"],
+    images: [IMG.macbook2],
     rating: 4.8,
     reviewCount: 3245,
     specs: [
@@ -239,7 +263,7 @@ export const products: Product[] = [
     shortDescription: "M3. Thin. Light.",
     price: 1099,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&h=800&fit=crop"],
+    images: [IMG.macbook2],
     rating: 4.7,
     reviewCount: 2876,
     specs: [
@@ -266,7 +290,7 @@ export const products: Product[] = [
     shortDescription: "M2. XDR display.",
     price: 1099,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&h=800&fit=crop"],
+    images: [IMG.ipad],
     rating: 4.8,
     reviewCount: 1654,
     specs: [
@@ -291,7 +315,7 @@ export const products: Product[] = [
     shortDescription: "M2. Colorful.",
     price: 599,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&h=800&fit=crop"],
+    images: [IMG.ipad2],
     rating: 4.7,
     reviewCount: 2134,
     specs: [
@@ -316,7 +340,7 @@ export const products: Product[] = [
     shortDescription: "All-screen. A14.",
     price: 449,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&h=800&fit=crop"],
+    images: [IMG.ipad2],
     rating: 4.5,
     reviewCount: 3456,
     specs: [
@@ -342,7 +366,7 @@ export const products: Product[] = [
     shortDescription: "Built for extremes.",
     price: 799,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&h=800&fit=crop"],
+    images: [IMG.watch],
     rating: 4.8,
     reviewCount: 1876,
     specs: [
@@ -364,7 +388,7 @@ export const products: Product[] = [
     shortDescription: "S9. Double tap.",
     price: 429,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&h=800&fit=crop"],
+    images: [IMG.watch],
     rating: 4.7,
     reviewCount: 3421,
     specs: [
@@ -391,7 +415,7 @@ export const products: Product[] = [
     shortDescription: "Essential. Affordable.",
     price: 249,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&h=800&fit=crop"],
+    images: [IMG.watch2],
     rating: 4.6,
     reviewCount: 2876,
     specs: [
@@ -417,7 +441,7 @@ export const products: Product[] = [
     shortDescription: "Adaptive Audio. ANC.",
     price: 249,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&h=800&fit=crop"],
+    images: [IMG.airpods2],
     rating: 4.8,
     reviewCount: 4521,
     specs: [
@@ -439,7 +463,7 @@ export const products: Product[] = [
     shortDescription: "Spatial Audio. MagSafe.",
     price: 169,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&h=800&fit=crop"],
+    images: [IMG.airpods2],
     rating: 4.6,
     reviewCount: 5234,
     specs: [
@@ -459,7 +483,7 @@ export const products: Product[] = [
     shortDescription: "Over-ear. Computational Audio.",
     price: 549,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&h=800&fit=crop"],
+    images: [IMG.airpodsMax],
     rating: 4.7,
     reviewCount: 1876,
     specs: [
@@ -486,7 +510,7 @@ export const products: Product[] = [
     shortDescription: "M3. 24-inch. All-in-one.",
     price: 1299,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=800&h=800&fit=crop"],
+    images: [IMG.imac],
     rating: 4.7,
     reviewCount: 1876,
     specs: [
@@ -516,7 +540,7 @@ export const products: Product[] = [
     shortDescription: "4K HDR. A15.",
     price: 149,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=800&h=800&fit=crop"],
+    images: [IMG.appletv],
     rating: 4.6,
     reviewCount: 2345,
     specs: [
@@ -538,7 +562,7 @@ export const products: Product[] = [
     shortDescription: "Up to 15W. Snap on.",
     price: 39,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1583394838336-acd977736f90?w=800&h=800&fit=crop"],
+    images: [IMG.charger],
     rating: 4.5,
     reviewCount: 5234,
     specs: [
@@ -558,7 +582,7 @@ export const products: Product[] = [
     shortDescription: "Portable. Snap on.",
     price: 99,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1583394838336-acd977736f90?w=800&h=800&fit=crop"],
+    images: [IMG.charger],
     rating: 4.4,
     reviewCount: 3456,
     specs: [
@@ -578,7 +602,7 @@ export const products: Product[] = [
     shortDescription: "Squeeze. Roll. Hover.",
     price: 129,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1624823183494-4d711f2f1a6c?w=800&h=800&fit=crop"],
+    images: [IMG.pencil],
     rating: 4.8,
     reviewCount: 1876,
     specs: [
@@ -598,7 +622,7 @@ export const products: Product[] = [
     shortDescription: "Precision. USB-C.",
     price: 79,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1624823183494-4d711f2f1a6c?w=800&h=800&fit=crop"],
+    images: [IMG.pencil],
     rating: 4.6,
     reviewCount: 2345,
     specs: [
@@ -618,7 +642,7 @@ export const products: Product[] = [
     shortDescription: "Floating. Trackpad. Backlit.",
     price: 299,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800&h=800&fit=crop"],
+    images: [IMG.keyboard],
     rating: 4.5,
     reviewCount: 1234,
     specs: [
@@ -638,7 +662,7 @@ export const products: Product[] = [
     shortDescription: "Wireless. Rechargeable.",
     price: 99,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800&h=800&fit=crop"],
+    images: [IMG.keyboard],
     rating: 4.6,
     reviewCount: 3456,
     specs: [
@@ -658,7 +682,7 @@ export const products: Product[] = [
     shortDescription: "Force Touch. Wireless.",
     price: 149,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800&h=800&fit=crop"],
+    images: [IMG.keyboard],
     rating: 4.7,
     reviewCount: 1876,
     specs: [
@@ -678,7 +702,7 @@ export const products: Product[] = [
     shortDescription: "Find your stuff.",
     price: 29,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=800&fit=crop"],
+    images: [IMG.airtag],
     rating: 4.5,
     reviewCount: 8765,
     specs: [
@@ -698,7 +722,7 @@ export const products: Product[] = [
     shortDescription: "Four. Find everything.",
     price: 99,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=800&fit=crop"],
+    images: [IMG.airtag],
     rating: 4.6,
     reviewCount: 5432,
     specs: [
@@ -718,7 +742,7 @@ export const products: Product[] = [
     shortDescription: "Soft. MagSafe.",
     price: 49,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1601593346742-7a179b641c2d?w=800&h=800&fit=crop"],
+    images: [IMG.case],
     rating: 4.4,
     reviewCount: 3456,
     specs: [
@@ -743,7 +767,7 @@ export const products: Product[] = [
     shortDescription: "20W. Compact.",
     price: 25,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1583394838336-acd977736f90?w=800&h=800&fit=crop"],
+    images: [IMG.charger],
     rating: 4.6,
     reviewCount: 8765,
     specs: [
@@ -763,7 +787,7 @@ export const products: Product[] = [
     shortDescription: "Touch clickpad. Siri.",
     price: 59,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=800&h=800&fit=crop"],
+    images: [IMG.remote],
     rating: 4.3,
     reviewCount: 2345,
     specs: [
@@ -784,7 +808,7 @@ export const products: Product[] = [
     shortDescription: "Dual port. 35W.",
     price: 59,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1583394838336-acd977736f90?w=800&h=800&fit=crop"],
+    images: [IMG.charger],
     rating: 4.7,
     reviewCount: 3421,
     specs: [
@@ -804,7 +828,7 @@ export const products: Product[] = [
     shortDescription: "67W. MacBook Pro.",
     price: 79,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1583394838336-acd977736f90?w=800&h=800&fit=crop"],
+    images: [IMG.charger],
     rating: 4.6,
     reviewCount: 2156,
     specs: [
@@ -824,7 +848,7 @@ export const products: Product[] = [
     shortDescription: "96W. Pro performance.",
     price: 99,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1583394838336-acd977736f90?w=800&h=800&fit=crop"],
+    images: [IMG.charger],
     rating: 4.7,
     reviewCount: 1876,
     specs: [
@@ -844,7 +868,7 @@ export const products: Product[] = [
     shortDescription: "iPhone + Watch. Folds flat.",
     price: 129,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1583394838336-acd977736f90?w=800&h=800&fit=crop"],
+    images: [IMG.charger],
     rating: 4.5,
     reviewCount: 2876,
     specs: [
@@ -865,7 +889,7 @@ export const products: Product[] = [
     shortDescription: "1m. Fast charge.",
     price: 25,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1583394838336-acd977736f90?w=800&h=800&fit=crop"],
+    images: [IMG.cable],
     rating: 4.6,
     reviewCount: 9876,
     specs: [
@@ -885,7 +909,7 @@ export const products: Product[] = [
     shortDescription: "2m. USB-C.",
     price: 29,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1583394838336-acd977736f90?w=800&h=800&fit=crop"],
+    images: [IMG.cable],
     rating: 4.7,
     reviewCount: 6543,
     specs: [
@@ -905,7 +929,7 @@ export const products: Product[] = [
     shortDescription: "MagSafe cable. 1m.",
     price: 35,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1583394838336-acd977736f90?w=800&h=800&fit=crop"],
+    images: [IMG.cable],
     rating: 4.5,
     reviewCount: 2345,
     specs: [
@@ -926,7 +950,7 @@ export const products: Product[] = [
     shortDescription: "Clear. MagSafe.",
     price: 49,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1601593346742-7a179b641c2d?w=800&h=800&fit=crop"],
+    images: [IMG.case],
     rating: 4.4,
     reviewCount: 4321,
     specs: [
@@ -946,7 +970,7 @@ export const products: Product[] = [
     shortDescription: "FineWoven. Premium.",
     price: 59,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1601593346742-7a179b641c2d?w=800&h=800&fit=crop"],
+    images: [IMG.case],
     rating: 4.3,
     reviewCount: 3456,
     specs: [
@@ -970,7 +994,7 @@ export const products: Product[] = [
     shortDescription: "Sport. Comfortable.",
     price: 49,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&h=800&fit=crop"],
+    images: [IMG.watch],
     rating: 4.7,
     reviewCount: 5678,
     specs: [
@@ -996,7 +1020,7 @@ export const products: Product[] = [
     shortDescription: "Multi-touch. Wireless.",
     price: 99,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800&h=800&fit=crop"],
+    images: [IMG.keyboard],
     rating: 4.5,
     reviewCount: 4321,
     specs: [
@@ -1016,7 +1040,7 @@ export const products: Product[] = [
     shortDescription: "Touch ID. Wireless.",
     price: 149,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800&h=800&fit=crop"],
+    images: [IMG.keyboard],
     rating: 4.8,
     reviewCount: 3456,
     specs: [
@@ -1036,7 +1060,7 @@ export const products: Product[] = [
     shortDescription: "Silicone. MagSafe.",
     price: 39,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1583394838336-acd977736f90?w=800&h=800&fit=crop"],
+    images: [IMG.charger],
     rating: 4.5,
     reviewCount: 2345,
     specs: [
@@ -1060,7 +1084,7 @@ export const products: Product[] = [
     shortDescription: "Folio. View & type.",
     price: 79,
     currency: "USD",
-    images: ["https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&h=800&fit=crop"],
+    images: [IMG.ipad2],
     rating: 4.6,
     reviewCount: 1876,
     specs: [
