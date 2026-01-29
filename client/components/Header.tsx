@@ -61,7 +61,7 @@ export default function Header() {
     { label: t("nav.ipad"), href: "/products?category=ipad" },
     { label: t("nav.macbook"), href: "/products?category=macbook" },
     { label: t("nav.accessories"), href: "/products?category=accessories" },
-    { label: t("nav.repair"), href: "/products?category=repair", icon: Wrench },
+    { label: t("nav.repair"), href: "/repair", icon: Wrench },
   ];
 
   const iconBtnClass =

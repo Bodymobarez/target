@@ -20,6 +20,7 @@ import Checkout from "./pages/Checkout";
 import Profile from "./pages/Profile";
 import Wishlist from "./pages/Wishlist";
 import Compare from "./pages/Compare";
+import Repair from "./pages/Repair";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import AdminLayout from "./pages/admin/AdminLayout";
@@ -85,6 +86,7 @@ export default function App() {
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/wishlist" element={<Wishlist />} />
                         <Route path="/compare" element={<Compare />} />
+                        <Route path="/repair" element={<Repair />} />
                         <Route path="*" element={<NotFound />} />
                       </Route>
                     </Routes>

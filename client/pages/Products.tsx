@@ -1,18 +1,25 @@
-import { useSearchParams, Link } from "react-router-dom";
+import { useSearchParams, Link, useNavigate } from "react-router-dom";
 import ProductCard from "@/components/ProductCard";
 import { products, categories } from "@/data/mockProducts";
 import { SlidersHorizontal, Wrench } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function Products() {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const categoryParam = searchParams.get("category") ?? "";
   const searchQuery = searchParams.get("q") ?? "";
   const [priceSort, setPriceSort] = useState<"default" | "asc" | "desc">("default");
   const [showFilters, setShowFilters] = useState(false);
+
+  useEffect(() => {
+    if (categoryParam === "repair") navigate("/repair", { replace: true });
+  }, [categoryParam, navigate]);
+
+  if (categoryParam === "repair") return null;
 
   const filtered = products.filter((p) => {
     const matchCategory = !categoryParam || p.categoryId === categoryParam;

@@ -102,7 +102,7 @@ export default function Index() {
               return (
               <motion.div key={cat.id} variants={item}>
                 <Link
-                  to={`/products?category=${cat.id}`}
+                  to={cat.id === "repair" ? "/repair" : `/products?category=${cat.id}`}
                   className={cn(
                     "group block card-interactive overflow-hidden rounded-2xl sm:rounded-3xl border border-border/60",
                     "hover:border-primary/10 dark:hover:border-primary/20",
