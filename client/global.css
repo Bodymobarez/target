@@ -1,0 +1,314 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /**
+   * Elite 8K Design System
+   * Ultra-sharp • Layered depth • Retina glass • Premium contrast
+   */
+  :root {
+    /* Logo colors — ذهبي وأسود */
+    --logo-gold: 43 96% 48%;
+    --logo-gold-light: 43 70% 58%;
+    --logo-gold-muted: 43 50% 70%;
+    --logo-black: 0 0% 9%;
+    --background: 0 0% 99%;
+    --foreground: var(--logo-black);
+    --card: 0 0% 100%;
+    --card-foreground: var(--logo-black);
+    --popover: 0 0% 100%;
+    --popover-foreground: var(--logo-black);
+    --primary: var(--logo-black);
+    --primary-foreground: 0 0% 99%;
+    --secondary: 43 30% 95%;
+    --secondary-foreground: var(--logo-black);
+    --muted: 43 20% 96%;
+    --muted-foreground: 240 4% 42%;
+    --accent: 43 70% 94%;
+    --accent-foreground: var(--logo-black);
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 43 25% 88%;
+    --input: 43 25% 88%;
+    --ring: var(--logo-black);
+    --radius: 1rem;
+    --radius-lg: 1.25rem;
+    /* Elite glass */
+    --glass-bg: rgba(255, 255, 255, 0.82);
+    --glass-border: rgba(255, 255, 255, 0.35);
+    --glass-edge: rgba(255, 255, 255, 0.9);
+    /* 8K layered shadows */
+    --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.02), 0 4px 12px rgba(0, 0, 0, 0.03);
+    --shadow-premium: 0 2px 4px rgba(0, 0, 0, 0.02), 0 8px 24px rgba(0, 0, 0, 0.04), 0 16px 48px rgba(0, 0, 0, 0.04);
+    --shadow-card-hover: 0 4px 8px rgba(0, 0, 0, 0.03), 0 12px 32px rgba(0, 0, 0, 0.06), 0 24px 64px rgba(0, 0, 0, 0.06);
+    --shadow-elite: 0 0 0 1px rgba(0, 0, 0, 0.02), 0 2px 4px rgba(0, 0, 0, 0.02), 0 8px 16px rgba(0, 0, 0, 0.04), 0 24px 48px rgba(0, 0, 0, 0.05);
+    --inner-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    --inner-highlight-card: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 10% 15%;
+    --sidebar-primary: 240 10% 6%;
+    --sidebar-primary-foreground: 0 0% 99%;
+    --sidebar-accent: 240 5% 96%;
+    --sidebar-accent-foreground: 240 10% 6%;
+    --sidebar-border: 240 6% 90%;
+    --sidebar-ring: 240 10% 6%;
+  }
+
+  .dark {
+    --logo-gold: 43 90% 52%;
+    --logo-gold-light: 43 70% 60%;
+    --logo-gold-muted: 43 50% 45%;
+    --background: 0 0% 5%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 7%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 7%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 5%;
+    --secondary: 43 20% 14%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 43 15% 14%;
+    --muted-foreground: 43 20% 58%;
+    --accent: 43 30% 16%;
+    --accent-foreground: 43 90% 60%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 43 20% 18%;
+    --input: 43 20% 18%;
+    --ring: 43 90% 52%;
+    --glass-bg: rgba(15, 12, 8, 0.78);
+    --glass-border: rgba(255, 255, 255, 0.06);
+    --glass-edge: rgba(255, 255, 255, 0.04);
+    --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.15);
+    --shadow-premium: 0 2px 4px rgba(0, 0, 0, 0.2), 0 8px 24px rgba(0, 0, 0, 0.2), 0 16px 48px rgba(0, 0, 0, 0.15);
+    --shadow-card-hover: 0 4px 8px rgba(0, 0, 0, 0.25), 0 12px 32px rgba(0, 0, 0, 0.2), 0 24px 64px rgba(0, 0, 0, 0.2);
+    --shadow-elite: 0 0 0 1px rgba(255, 255, 255, 0.03), 0 2px 4px rgba(0, 0, 0, 0.2), 0 8px 16px rgba(0, 0, 0, 0.2), 0 24px 48px rgba(0, 0, 0, 0.25);
+    --inner-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    --inner-highlight-card: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    --sidebar-background: 240 10% 4%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 0 0% 98%;
+    --sidebar-primary-foreground: 240 10% 4%;
+    --sidebar-accent: 240 6% 12%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 240 6% 14%;
+    --sidebar-ring: 240 4% 64%;
+  }
+}
+
+/* RTL support for Arabic */
+[dir="rtl"] {
+  text-align: right;
+}
+
+[dir="rtl"] .text-left {
+  text-align: right;
+}
+
+[dir="rtl"] .text-right {
+  text-align: left;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
+  }
+
+  :where(p, span, li, h1, h2, h3, h4, h5, h6, a, button, label, td, th) {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+    letter-spacing: -0.03em;
+  }
+
+  h1 {
+    @apply text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold;
+    letter-spacing: -0.04em;
+    text-rendering: optimizeLegibility;
+  }
+
+  h2 {
+    @apply text-3xl md:text-4xl lg:text-5xl;
+    letter-spacing: -0.035em;
+  }
+
+  h3 {
+    @apply text-2xl md:text-3xl;
+    letter-spacing: -0.02em;
+  }
+
+  pre,
+  code {
+    overflow-x: auto;
+    white-space: pre;
+  }
+}
+
+@layer components {
+  /* Elite glass — 8K blur + edge highlight */
+  .glass-effect {
+    @apply backdrop-blur-2xl border border-border/60;
+    background: var(--glass-bg);
+    border-color: var(--glass-border);
+    box-shadow: var(--inner-highlight), 0 0 0 1px rgba(0, 0, 0, 0.02);
+  }
+
+  .dark .glass-effect {
+    box-shadow: var(--inner-highlight), 0 0 0 1px rgba(255, 255, 255, 0.03);
+  }
+
+  .glass-effect-sm {
+    @apply backdrop-blur-xl border border-border/50;
+    background: var(--glass-bg);
+    box-shadow: var(--inner-highlight);
+  }
+
+  .smooth-transition {
+    @apply transition-all duration-300 ease-out;
+  }
+
+  .motion-smooth {
+    @apply transition-all duration-500;
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Elite buttons — sharp, layered shadow, inner highlight */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl font-semibold;
+    @apply bg-primary text-primary-foreground;
+    @apply transition-all duration-300 ease-out;
+    box-shadow: var(--inner-highlight), 0 1px 2px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .btn-primary:hover {
+    box-shadow: var(--inner-highlight), 0 2px 4px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.1);
+    @apply opacity-95;
+  }
+
+  /* Gold accent variant — لون الشعار */
+  .btn-gold {
+    background: hsl(var(--logo-gold));
+    color: hsl(0 0% 9%);
+    box-shadow: var(--inner-highlight), 0 1px 2px rgba(0, 0, 0, 0.08), 0 4px 12px hsl(var(--logo-gold) / 0.3);
+  }
+  .btn-gold:hover {
+    background: hsl(var(--logo-gold-light));
+    box-shadow: var(--inner-highlight), 0 2px 4px rgba(0, 0, 0, 0.1), 0 8px 24px hsl(var(--logo-gold) / 0.25);
+  }
+  .dark .btn-gold {
+    color: hsl(0 0% 5%);
+  }
+
+  .btn-primary:active {
+    @apply scale-[0.98];
+    box-shadow: var(--inner-highlight), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  }
+
+  .btn-primary:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  .dark .btn-primary {
+    box-shadow: var(--inner-highlight), 0 1px 2px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.25);
+  }
+
+  .dark .btn-primary:hover {
+    box-shadow: var(--inner-highlight), 0 2px 4px rgba(0, 0, 0, 0.25), 0 8px 24px rgba(0, 0, 0, 0.3);
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl font-semibold;
+    @apply bg-secondary text-secondary-foreground border border-border/80;
+    @apply transition-all duration-300 ease-out;
+    box-shadow: var(--inner-highlight-card), 0 1px 2px rgba(0, 0, 0, 0.03);
+  }
+
+  .btn-secondary:hover {
+    @apply bg-secondary/90 border-border;
+    box-shadow: var(--inner-highlight-card), 0 2px 4px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.04);
+  }
+
+  .btn-secondary:active {
+    @apply scale-[0.98];
+  }
+
+  .btn-secondary:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-medium;
+    @apply text-foreground/90 hover:bg-accent hover:text-foreground;
+    @apply transition-all duration-200;
+  }
+
+  /* Elite cards — 8K layered shadow + crisp inner highlight */
+  .card-premium {
+    @apply rounded-2xl border border-border/50 bg-card;
+    @apply transition-all duration-500;
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: var(--inner-highlight-card), var(--shadow-soft);
+  }
+
+  .card-premium:hover {
+    box-shadow: var(--inner-highlight-card), var(--shadow-premium);
+    @apply border-border/70;
+  }
+
+  .card-interactive {
+    @apply card-premium cursor-pointer;
+    @apply hover:-translate-y-0.5;
+  }
+
+  .card-interactive:hover {
+    box-shadow: var(--inner-highlight-card), var(--shadow-card-hover);
+    @apply border-border/80;
+  }
+
+  .section-padding {
+    @apply py-12 sm:py-16 md:py-20 lg:py-28;
+  }
+
+  .container-apple {
+    @apply max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8;
+  }
+
+  /* Elite hero mesh — refined gradients for 8K depth */
+  .hero-mesh {
+    background:
+      radial-gradient(ellipse 100% 60% at 50% -30%, hsl(var(--primary) / 0.06), transparent 50%),
+      radial-gradient(ellipse 70% 50% at 100% -10%, hsl(var(--primary) / 0.04), transparent 45%),
+      radial-gradient(ellipse 70% 50% at 0% -10%, hsl(var(--primary) / 0.04), transparent 45%);
+  }
+
+  .dark .hero-mesh {
+    background:
+      radial-gradient(ellipse 100% 60% at 50% -30%, hsl(var(--primary) / 0.12), transparent 50%),
+      radial-gradient(ellipse 70% 50% at 100% -10%, hsl(var(--primary) / 0.06), transparent 45%),
+      radial-gradient(ellipse 70% 50% at 0% -10%, hsl(var(--primary) / 0.06), transparent 45%);
+  }
+
+  /* 8K sharp focus ring */
+  .focus-elite:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+    box-shadow: 0 0 0 1px hsl(var(--ring) / 0.2);
+  }
+}

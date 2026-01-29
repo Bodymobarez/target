@@ -1,0 +1,239 @@
+// Premium Apple Store - Full database schema
+// Use with: npx prisma generate, npx prisma migrate dev
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ----- Users & Auth -----
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String?   @map("password_hash")
+  name          String?
+  role          Role      @default(CUSTOMER)
+  emailVerified Boolean   @default(false) @map("email_verified")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  orders     Order[]
+  wishlists  WishlistItem[]
+  addresses  Address[]
+  sessions   Session?
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+  STAFF
+  VENDOR
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  token     String   @unique
+  expiresAt DateTime @map("expires_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ----- Products & Catalog -----
+model Category {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  name        String
+  description String?
+  image       String?
+  parentId    String?   @map("parent_id")
+  parent      Category? @relation("CategoryTree", fields: [parentId], references: [id])
+  children    Category[] @relation("CategoryTree")
+  products    Product[]
+}
+
+model Product {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  name            String
+  categoryId      String   @map("category_id")
+  category        Category @relation(fields: [categoryId], references: [id])
+  subcategory     String?
+  description     String   @db.Text
+  shortDescription String? @map("short_description")
+  price           Decimal  @db.Decimal(10, 2)
+  originalPrice   Decimal? @map("original_price") @db.Decimal(10, 2)
+  currency        String   @default("USD")
+  badge           String?  // New, Pro, Best Seller
+  inStock         Boolean  @default(true) @map("in_stock")
+  rating          Decimal  @default(0) @db.Decimal(3, 2)
+  reviewCount     Int      @default(0) @map("review_count")
+  videoUrl        String?  @map("video_url")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  images       ProductImage[]
+  specs        ProductSpec[]
+  colors       ProductColor[]
+  variants     ProductVariant[]
+  reviews      Review[]
+  orderItems   OrderItem[]
+  wishlists    WishlistItem[]
+  accessoryIds ProductAccessory[]
+}
+
+model ProductImage {
+  id        String  @id @default(cuid())
+  productId String  @map("product_id")
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  alt       String?
+  sortOrder Int     @default(0) @map("sort_order")
+}
+
+model ProductSpec {
+  id        String  @id @default(cuid())
+  productId String  @map("product_id")
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  label     String
+  value     String  @db.Text
+}
+
+model ProductColor {
+  id        String  @id @default(cuid())
+  productId String  @map("product_id")
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name      String
+  hex       String
+}
+
+model ProductVariant {
+  id        String  @id @default(cuid())
+  productId String  @map("product_id")
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sku       String  @unique
+  name      String?
+  price     Decimal @db.Decimal(10, 2)
+  stock     Int     @default(0)
+}
+
+model ProductAccessory {
+  id            String  @id @default(cuid())
+  productId     String  @map("product_id")
+  product       Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  accessoryId   String  @map("accessory_id")
+}
+
+// ----- Orders & Payments -----
+model Order {
+  id              String        @id @default(cuid())
+  userId          String?       @map("user_id")
+  user            User?         @relation(fields: [userId], references: [id])
+  status          OrderStatus   @default(PENDING)
+  subtotal        Decimal       @db.Decimal(10, 2)
+  shipping        Decimal       @db.Decimal(10, 2)
+  tax             Decimal       @db.Decimal(10, 2)
+  total           Decimal       @db.Decimal(10, 2)
+  currency        String        @default("USD")
+  shippingAddress Json          @map("shipping_address")
+  billingAddress  Json?         @map("billing_address")
+  trackingNumber  String?       @map("tracking_number")
+  shippedAt       DateTime?     @map("shipped_at")
+  paidAt          DateTime?    @map("paid_at")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+
+  items    OrderItem[]
+  payment  Payment?
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String  @map("order_id")
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String  @map("product_id")
+  product   Product @relation(fields: [productId], references: [id])
+  name      String
+  price     Decimal @db.Decimal(10, 2)
+  quantity  Int
+  color     String?
+  image     String?
+}
+
+model Payment {
+  id            String   @id @default(cuid())
+  orderId       String   @unique @map("order_id")
+  order         Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  provider      String   // stripe, paypal, apple_pay
+  externalId    String?  @map("external_id")
+  amount        Decimal  @db.Decimal(10, 2)
+  currency      String
+  status        String
+  createdAt     DateTime @default(now()) @map("created_at")
+}
+
+// ----- Wishlist -----
+model WishlistItem {
+  id        String  @id @default(cuid())
+  userId    String  @map("user_id")
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String  @map("product_id")
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([userId, productId])
+}
+
+// ----- Addresses -----
+model Address {
+  id        String  @id @default(cuid())
+  userId    String  @map("user_id")
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label     String?
+  line1     String
+  line2     String?
+  city      String
+  state     String?
+  zip       String
+  country   String
+  isDefault Boolean @default(false) @map("is_default")
+}
+
+// ----- Reviews -----
+model Review {
+  id        String  @id @default(cuid())
+  productId String  @map("product_id")
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId    String  @map("user_id")
+  rating   Int
+  title    String?
+  body     String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+}
+
+// ----- Coupons -----
+model Coupon {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  type        String   // percent, fixed
+  value       Decimal  @db.Decimal(10, 2)
+  minOrder    Decimal? @map("min_order") @db.Decimal(10, 2)
+  maxUses     Int?     @map("max_uses")
+  usedCount   Int      @default(0) @map("used_count")
+  startsAt    DateTime @map("starts_at")
+  expiresAt   DateTime @map("expires_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+}
