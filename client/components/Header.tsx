@@ -1,16 +1,18 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, X, Search, ShoppingCart, User, Sun, Moon, Heart, GitCompare } from "lucide-react";
+import { Menu, X, Search, ShoppingCart, User, Sun, Moon, Heart, GitCompare, LogOut, Wrench } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useCompare } from "@/context/CompareContext";
 import { useLanguage } from "@/context/LanguageContext";
+import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
 
 export default function Header() {
   const navigate = useNavigate();
   const { t, locale, setLocale } = useLanguage();
+  const { user, logout } = useAuth();
   const [isDark, setIsDark] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
@@ -59,6 +61,7 @@ export default function Header() {
     { label: t("nav.ipad"), href: "/products?category=ipad" },
     { label: t("nav.macbook"), href: "/products?category=macbook" },
     { label: t("nav.accessories"), href: "/products?category=accessories" },
+    { label: t("nav.repair"), href: "/products?category=repair", icon: Wrench },
   ];
 
   const iconBtnClass =
@@ -68,27 +71,44 @@ export default function Header() {
     <header className="sticky top-0 z-50 glass-effect border-b border-border/50">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14 sm:h-16 md:h-20 gap-2">
-          <Link
-            to="/"
-            className="flex items-center gap-2 rounded-xl p-1.5 -m-1.5 hover:bg-secondary/50 smooth-transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-          >
-            <img src="/targ.png" alt={t("appName")} className="h-10 w-auto sm:h-12 md:h-14" />
-          </Link>
+          <div className="flex items-center gap-1 sm:gap-2 min-w-0">
+            <Link
+              to="/"
+              className="flex items-center justify-start rounded-xl p-1.5 -m-1.5 hover:bg-secondary/50 smooth-transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 min-w-0"
+            >
+              <img src="/targ.png" alt={t("appName")} className="h-20 w-auto sm:h-24 md:h-28" />
+            </Link>
+          </div>
 
           <nav className="hidden md:flex items-center gap-1">
-            {navLinks.map((link) => (
+            {navLinks.map((link) => {
+              const Icon = "icon" in link ? link.icon : null;
+              return (
+                <Link
+                  key={link.href}
+                  to={link.href}
+                  className={cn(
+                    "relative inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium text-foreground/80 hover:text-gold smooth-transition",
+                    "hover:bg-gold/5",
+                    "after:absolute after:inset-x-2 after:bottom-1.5 after:h-0.5 after:rounded-full after:bg-gold after:scale-x-0 after:origin-center hover:after:scale-x-100 after:transition-transform after:duration-300"
+                  )}
+                >
+                  {Icon && <Icon className="w-4 h-4 flex-shrink-0" />}
+                  {link.label}
+                </Link>
+              );
+            })}
+            {user?.role === "ADMIN" && (
               <Link
-                key={link.href}
-                to={link.href}
+                to="/admin"
                 className={cn(
-                  "relative px-4 py-2.5 rounded-xl text-sm font-medium text-foreground/80 hover:text-gold smooth-transition",
-                  "hover:bg-gold/5",
-                  "after:absolute after:inset-x-2 after:bottom-1.5 after:h-0.5 after:rounded-full after:bg-gold after:scale-x-0 after:origin-center hover:after:scale-x-100 after:transition-transform after:duration-300"
+                  "relative px-4 py-2.5 rounded-xl text-sm font-medium text-gold hover:bg-gold/10 smooth-transition",
+                  "after:absolute after:inset-x-2 after:bottom-1.5 after:h-0.5 after:rounded-full after:bg-gold after:scale-x-100"
                 )}
               >
-                {link.label}
+                {t("nav.admin")}
               </Link>
-            ))}
+            )}
           </nav>
 
           {/* أيقونات: مخفية على الموبايل (تظهر كتابس في الفوتر) */}
@@ -180,18 +200,57 @@ export default function Header() {
               )}
             </Link>
 
-            <Link to="/profile" className={iconBtnClass} title={t("nav.profile")}>
-              <User className="w-4 h-4 sm:w-5 sm:h-5" />
-            </Link>
+            {user ? (
+              <>
+                <Link to="/profile" className={iconBtnClass} title={t("nav.profile")}>
+                  <User className="w-4 h-4 sm:w-5 sm:h-5" />
+                </Link>
+                <button
+                  type="button"
+                  onClick={logout}
+                  className={cn(iconBtnClass, "text-muted-foreground hover:text-destructive")}
+                  title={t("auth.signOut")}
+                  aria-label={t("auth.signOut")}
+                >
+                  <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
+                </button>
+              </>
+            ) : (
+              <Link
+                to="/signin"
+                className={cn(
+                  "px-3 py-2 rounded-xl text-sm font-semibold smooth-transition",
+                  "bg-gold/15 text-gold hover:bg-gold hover:text-black dark:hover:text-black"
+                )}
+              >
+                {t("nav.signIn")}
+              </Link>
+            )}
           </div>
 
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className={cn("md:hidden", iconBtnClass)}
-            aria-label={isMobileMenuOpen ? "إغلاق القائمة" : "فتح القائمة"}
-          >
-            {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" aria-hidden />}
-          </button>
+          {/* موبايل: زر اللغة + قائمة */}
+          <div className="flex md:hidden items-center gap-1">
+            <button
+              type="button"
+              onClick={() => setLocale(locale === "ar" ? "en" : "ar")}
+              className={cn(
+                "px-2.5 py-2 rounded-xl text-xs font-semibold smooth-transition",
+                "bg-secondary/60 hover:bg-secondary text-foreground/90",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              )}
+              title={locale === "ar" ? "English" : "العربية"}
+              aria-label={locale === "ar" ? "Switch to English" : "التبديل إلى العربية"}
+            >
+              {locale === "ar" ? "EN" : "ع"}
+            </button>
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className={iconBtnClass}
+              aria-label={isMobileMenuOpen ? "إغلاق القائمة" : "فتح القائمة"}
+            >
+              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" aria-hidden />}
+            </button>
+          </div>
         </div>
 
         <AnimatePresence>
@@ -204,16 +263,58 @@ export default function Header() {
               className="md:hidden overflow-hidden border-t border-border/50"
             >
               <div className="py-4 space-y-1">
-                {navLinks.map((link) => (
+                {navLinks.map((link) => {
+                  const Icon = "icon" in link ? link.icon : null;
+                  return (
+                    <Link
+                      key={link.href}
+                      to={link.href}
+                      className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium hover:bg-secondary smooth-transition"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      {Icon && <Icon className="w-4 h-4 flex-shrink-0" />}
+                      {link.label}
+                    </Link>
+                  );
+                })}
+                {user ? (
+                  <>
+                    <Link
+                      to="/profile"
+                      className="block px-4 py-3 rounded-xl text-sm font-medium hover:bg-secondary smooth-transition"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      {t("nav.profile")}
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        logout();
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="block w-full text-left px-4 py-3 rounded-xl text-sm font-medium hover:bg-secondary smooth-transition text-muted-foreground hover:text-destructive"
+                    >
+                      {t("auth.signOut")}
+                    </button>
+                  </>
+                ) : (
                   <Link
-                    key={link.href}
-                    to={link.href}
-                    className="block px-4 py-3 rounded-xl text-sm font-medium hover:bg-secondary smooth-transition"
+                    to="/signin"
+                    className="block px-4 py-3 rounded-xl text-sm font-medium hover:bg-secondary smooth-transition text-gold"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    {link.label}
+                    {t("nav.signIn")}
                   </Link>
-                ))}
+                )}
+                {user?.role === "ADMIN" && (
+                  <Link
+                    to="/admin"
+                    className="block px-4 py-3 rounded-xl text-sm font-medium hover:bg-secondary smooth-transition text-gold"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {t("nav.admin")}
+                  </Link>
+                )}
               </div>
             </motion.nav>
           )}

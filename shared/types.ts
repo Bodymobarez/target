@@ -10,7 +10,8 @@ export type ProductCategoryId =
   | "watch"
   | "airpods"
   | "appletv"
-  | "accessories";
+  | "accessories"
+  | "repair";
 
 export interface ProductSpec {
   label: string;

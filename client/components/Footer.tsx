@@ -11,12 +11,13 @@ export default function Footer() {
   const { count: cartCount } = useCart();
   const { count: wishlistCount } = useWishlist();
 
-  const quickTabs = [
+  type QuickTab = { to: string; icon: typeof Home; label: string; count?: number };
+  const quickTabs: QuickTab[] = [
     { to: "/", icon: Home, label: t("nav.home") },
     { to: "/cart", icon: ShoppingCart, label: t("nav.cart"), count: cartCount },
     { to: "/wishlist", icon: Heart, label: t("nav.wishlist"), count: wishlistCount },
     { to: "/profile", icon: User, label: t("nav.profile") },
-  ] as const;
+  ];
 
   const pathname = location.pathname;
 

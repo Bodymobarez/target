@@ -9,6 +9,10 @@ import {
   Settings,
   Menu,
   X,
+  Truck,
+  ShoppingBag,
+  FileText,
+  PackageCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
@@ -16,7 +20,11 @@ import { useLanguage } from "@/context/LanguageContext";
 const navKeys = [
   { to: "/admin", labelKey: "admin.dashboard", icon: LayoutDashboard },
   { to: "/admin/products", labelKey: "admin.products", icon: Package },
-  { to: "/admin/orders", labelKey: "admin.orders", icon: ShoppingCart },
+  { to: "/admin/suppliers", labelKey: "admin.suppliers", icon: Truck },
+  { to: "/admin/purchases", labelKey: "admin.purchases", icon: ShoppingBag },
+  { to: "/admin/orders", labelKey: "admin.sales", icon: ShoppingCart },
+  { to: "/admin/invoices", labelKey: "admin.invoices", icon: FileText },
+  { to: "/admin/delivery", labelKey: "admin.delivery", icon: PackageCheck },
   { to: "/admin/users", labelKey: "admin.users", icon: Users },
   { to: "/admin/analytics", labelKey: "admin.analytics", icon: BarChart3 },
   { to: "/admin/settings", labelKey: "admin.settings", icon: Settings },

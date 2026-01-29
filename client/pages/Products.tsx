@@ -1,7 +1,7 @@
 import { useSearchParams, Link } from "react-router-dom";
 import ProductCard from "@/components/ProductCard";
 import { products, categories } from "@/data/mockProducts";
-import { SlidersHorizontal } from "lucide-react";
+import { SlidersHorizontal, Wrench } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
@@ -33,9 +33,11 @@ export default function Products() {
 
   const pageTitle = searchQuery
     ? t("products.searchTitle", { query: searchQuery })
-    : categoryParam
-      ? categories.find((c) => c.id === categoryParam)?.name ?? t("products.title")
-      : t("products.title");
+    : categoryParam === "repair"
+      ? t("categories.repair.name")
+      : categoryParam
+        ? categories.find((c) => c.id === categoryParam)?.name ?? t("products.title")
+        : t("products.title");
 
   return (
     <div className="min-h-screen bg-background">
@@ -74,20 +76,24 @@ export default function Products() {
                     >
                       {t("products.all")}
                     </Link>
-                    {categories.map((cat) => (
-                      <Link
-                        key={cat.id}
-                        to={`/products?category=${cat.id}`}
-                        className={cn(
-                          "block text-sm py-2 px-3 rounded-lg motion-smooth",
-                          categoryParam === cat.id
-                            ? "bg-primary text-primary-foreground"
-                            : "text-muted-foreground hover:bg-secondary"
-                        )}
-                      >
-                        {cat.name}
-                      </Link>
-                    ))}
+                    {categories.map((cat) => {
+                      const label = cat.id === "repair" ? t("categories.repair.name") : cat.name;
+                      return (
+                        <Link
+                          key={cat.id}
+                          to={`/products?category=${cat.id}`}
+                          className={cn(
+                            "flex items-center gap-2 text-sm py-2 px-3 rounded-lg motion-smooth",
+                            categoryParam === cat.id
+                              ? "bg-primary text-primary-foreground"
+                              : "text-muted-foreground hover:bg-secondary"
+                          )}
+                        >
+                          {cat.id === "repair" && <Wrench className="w-4 h-4 flex-shrink-0" />}
+                          {label}
+                        </Link>
+                      );
+                    })}
                   </div>
                 </div>
                 <div>
@@ -147,24 +153,28 @@ export default function Products() {
                   >
                     {t("products.all")}
                   </Link>
-                  {categories.map((cat) => (
-                    <Link
-                      key={cat.id}
-                      to={`/products?category=${cat.id}`}
-                      className={cn(
-                        "px-3 py-1.5 rounded-lg text-sm motion-smooth",
-                        categoryParam === cat.id
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-secondary"
-                      )}
-                    >
-                      {cat.name}
-                    </Link>
-                  ))}
+                  {categories.map((cat) => {
+                    const label = cat.id === "repair" ? t("categories.repair.name") : cat.name;
+                    return (
+                      <Link
+                        key={cat.id}
+                        to={`/products?category=${cat.id}`}
+                        className={cn(
+                          "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm motion-smooth",
+                          categoryParam === cat.id
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-secondary"
+                        )}
+                      >
+                        {cat.id === "repair" && <Wrench className="w-3.5 h-3.5" />}
+                        {label}
+                      </Link>
+                    );
+                  })}
                 </div>
               </div>
             )}
-            <div className="grid grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+            <div className="grid grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
               {sorted.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}

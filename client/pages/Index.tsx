@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import ProductCard from "@/components/ProductCard";
 import HeroSlider from "@/components/HeroSlider";
 import { motion } from "framer-motion";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Wrench } from "lucide-react";
 import { categories, getFeaturedProducts } from "@/data/mockProducts";
 import { useLanguage } from "@/context/LanguageContext";
 import { cn } from "@/lib/utils";
@@ -54,14 +54,14 @@ export default function Index() {
             >
               <Link
                 to="/products"
-                className="btn-primary btn-gold inline-flex items-center gap-2 text-sm sm:text-base md:text-lg px-6 py-3 sm:px-8 sm:py-4 rounded-xl sm:rounded-2xl shadow-lg w-full sm:w-auto justify-center"
+                className="btn-primary btn-gold inline-flex items-center gap-1.5 text-xs sm:text-sm md:text-base px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg sm:rounded-xl shadow-md w-full sm:w-auto justify-center"
               >
                 {t("home.shopAll")}
-                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </Link>
               <Link
                 to="/products?category=iphone"
-                className="inline-flex items-center gap-2 px-4 py-2.5 sm:px-6 sm:py-3.5 rounded-xl sm:rounded-2xl font-semibold text-sm sm:text-base bg-white/15 backdrop-blur-sm border border-white/30 text-white hover:bg-white/25 hover:border-gold/50 transition-all w-full sm:w-auto justify-center"
+                className="inline-flex items-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm bg-white/15 backdrop-blur-sm border border-white/30 text-white hover:bg-white/25 hover:border-gold/50 transition-all w-full sm:w-auto justify-center"
               >
                 {t("nav.iphone")}
               </Link>
@@ -70,14 +70,14 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Categories */}
+      {/* Categories — محسّن للموبايل */}
       <section className="section-padding border-t border-border/50 bg-secondary/20">
         <div className="container-apple">
           <motion.h2
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-4xl md:text-5xl font-bold mb-4"
+            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-2 sm:mb-4"
           >
             {t("home.shopByCategory")}
           </motion.h2>
@@ -85,7 +85,7 @@ export default function Index() {
             initial={{ opacity: 0, y: 8 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-muted-foreground text-lg mb-12 max-w-xl"
+            className="text-muted-foreground text-sm sm:text-base md:text-lg mb-6 sm:mb-8 md:mb-12 max-w-xl"
           >
             {t("home.allProducts")}
           </motion.p>
@@ -93,74 +93,94 @@ export default function Index() {
             variants={container}
             initial="hidden"
             whileInView="show"
-            viewport={{ once: true, margin: "-50px" }}
-            className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6"
+            viewport={{ once: true, margin: "-30px" }}
+            className="grid grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-6"
           >
-            {categories.map((cat) => (
+            {categories.map((cat) => {
+              const name = cat.id === "repair" ? t("categories.repair.name") : cat.name;
+              const description = cat.id === "repair" ? t("categories.repair.description") : cat.description;
+              return (
               <motion.div key={cat.id} variants={item}>
                 <Link
                   to={`/products?category=${cat.id}`}
                   className={cn(
-                    "group block card-interactive overflow-hidden rounded-3xl",
-                    "hover:border-primary/10 dark:hover:border-primary/20"
+                    "group block card-interactive overflow-hidden rounded-2xl sm:rounded-3xl border border-border/60",
+                    "hover:border-primary/10 dark:hover:border-primary/20",
+                    "active:scale-[0.98] transition-transform"
                   )}
                 >
-                  <div className="aspect-square rounded-t-3xl overflow-hidden bg-secondary/30">
+                  <div className="relative aspect-[4/3] sm:aspect-square rounded-t-2xl sm:rounded-t-3xl overflow-hidden bg-secondary/30">
                     <img
                       src={cat.image ?? ""}
-                      alt={cat.name}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      alt={name}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 group-active:scale-100"
                     />
+                    {cat.id === "repair" && (
+                      <div className="absolute top-2 right-2 sm:top-3 sm:right-3 flex items-center justify-center w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-gold/90 text-white shadow-lg" aria-hidden>
+                        <Wrench className="w-4 h-4 sm:w-5 sm:h-5" />
+                      </div>
+                    )}
                   </div>
-                  <div className="p-6">
-                    <h3 className="text-xl font-semibold mb-2 group-hover:text-primary/90 smooth-transition">
-                      {cat.name}
+                  <div className="p-3 sm:p-4 md:p-6">
+                    <h3 className="text-sm sm:text-base md:text-xl font-semibold mb-0.5 sm:mb-1 md:mb-2 group-hover:text-primary/90 smooth-transition line-clamp-1">
+                      {name}
                     </h3>
-                    <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
-                      {cat.description}
+                    <p className="text-muted-foreground text-xs sm:text-sm mb-2 sm:mb-3 md:mb-4 line-clamp-2 hidden sm:block">
+                      {description}
                     </p>
-                    <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-gold group-hover:gap-2 smooth-transition">
+                    <span className="inline-flex items-center gap-1 text-xs sm:text-sm font-semibold text-gold group-hover:gap-1.5 smooth-transition">
                       {t("shop")}
-                      <ChevronRight className="w-4 h-4" />
+                      <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </span>
                   </div>
                 </Link>
               </motion.div>
-            ))}
+            );
+            })}
           </motion.div>
         </div>
       </section>
 
-      {/* Featured Products */}
-      <section className="section-padding border-t border-border/50">
+      {/* Featured Products — تصميم محدّث */}
+      <section className="section-padding border-t border-border/50 bg-gradient-to-b from-background to-secondary/10">
         <div className="container-apple">
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-12">
-            <motion.h2
-              initial={{ opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-4xl md:text-5xl font-bold"
-            >
-              {t("home.featuredProducts")}
-            </motion.h2>
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 sm:gap-4 mb-6 sm:mb-8 md:mb-12">
+            <div>
+              <motion.span
+                initial={{ opacity: 0, x: -8 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-gold"
+              >
+                {t("shop")}
+              </motion.span>
+              <motion.h2
+                initial={{ opacity: 0, y: 8 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mt-1"
+              >
+                {t("home.featuredProducts")}
+              </motion.h2>
+            </div>
             <Link
               to="/products"
-              className="text-gold font-semibold inline-flex items-center gap-1.5 hover:gap-2 hover:text-gold-light smooth-transition"
+              className="text-gold font-semibold inline-flex items-center gap-1.5 hover:gap-2 hover:text-gold-light smooth-transition text-sm sm:text-base"
             >
               {t("seeAll")}
-              <ChevronRight className="w-5 h-5" />
+              <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
             </Link>
           </div>
           <motion.div
             variants={container}
             initial="hidden"
             whileInView="show"
-            viewport={{ once: true, margin: "-40px" }}
-            className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8"
+            viewport={{ once: true, margin: "-30px" }}
+            className="grid grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 md:gap-6 lg:gap-8"
           >
             {featured.map((product) => (
               <motion.div key={product.id} variants={item}>
-                <ProductCard product={product} />
+                <ProductCard product={product} compact />
               </motion.div>
             ))}
           </motion.div>

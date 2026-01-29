@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useCart } from "@/context/CartContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { usdToEgp } from "@/lib/currency";
+import { EGYPT_PAYMENT_METHODS } from "@/data/egypt";
 import { ArrowRight, ArrowLeft, CreditCard, Truck, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -13,9 +14,10 @@ type Step = "shipping" | "payment" | "review";
 
 export default function Checkout() {
   const { items, clearCart } = useCart();
-  const { t, formatPrice, formatPriceFromUsd } = useLanguage();
+  const { t, formatPrice, formatPriceFromUsd, locale } = useLanguage();
   const [step, setStep] = useState<Step>("shipping");
   const [orderPlaced, setOrderPlaced] = useState(false);
+  const [selectedPaymentId, setSelectedPaymentId] = useState<string>("cod");
 
   const subtotalUsd = items.reduce((s, i) => s + i.price * i.quantity, 0);
   const subtotalEgp = items.reduce(
@@ -113,6 +115,9 @@ export default function Checkout() {
                   <h2 className="text-xl font-bold mb-6">
                     {t("checkout.shippingAddress")}
                   </h2>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    {t("checkout.shippingEgyptNote")}
+                  </p>
                   <div className="grid gap-4">
                     <input
                       type="text"
@@ -132,7 +137,7 @@ export default function Checkout() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <input
                         type="text"
-                        placeholder={t("checkout.city")}
+                        placeholder={t("checkout.governorate")}
                         className="w-full px-4 py-3 rounded-xl border border-border bg-background"
                       />
                       <input
@@ -158,28 +163,38 @@ export default function Checkout() {
                   <h2 className="text-xl font-bold mb-6">
                     {t("checkout.payment")}
                   </h2>
-                  <div className="space-y-4">
-                    <div className="flex gap-4 p-4 rounded-xl border border-border bg-secondary/30">
-                      <CreditCard className="w-6 h-6 text-muted-foreground" />
-                      <div>
-                        <p className="font-medium">{t("checkout.creditCard")}</p>
-                        <p className="text-sm text-muted-foreground">Visa, Mastercard, Amex</p>
-                      </div>
-                    </div>
-                    <div className="flex gap-4 p-4 rounded-xl border border-border bg-secondary/30">
-                      <span className="text-2xl">🍎</span>
-                      <div>
-                        <p className="font-medium">{t("checkout.applePay")}</p>
-                        <p className="text-sm text-muted-foreground">Pay with Face ID or Touch ID</p>
-                      </div>
-                    </div>
-                    <div className="flex gap-4 p-4 rounded-xl border border-border bg-secondary/30">
-                      <span className="text-2xl">P</span>
-                      <div>
-                        <p className="font-medium">{t("checkout.paypal")}</p>
-                        <p className="text-sm text-muted-foreground">Pay with your PayPal account</p>
-                      </div>
-                    </div>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    {t("checkout.paymentEgyptNote")}
+                  </p>
+                  <div className="space-y-3">
+                    {EGYPT_PAYMENT_METHODS.map((pm) => {
+                      const name = locale === "ar" ? pm.nameAr : pm.nameEn;
+                      const isSelected = selectedPaymentId === pm.id;
+                      return (
+                        <button
+                          key={pm.id}
+                          type="button"
+                          onClick={() => setSelectedPaymentId(pm.id)}
+                          className={cn(
+                            "w-full flex gap-4 p-4 rounded-xl border text-left smooth-transition",
+                            isSelected
+                              ? "border-primary bg-primary/10 ring-2 ring-primary/30"
+                              : "border-border bg-secondary/30 hover:bg-secondary/50"
+                          )}
+                        >
+                          <span className="text-2xl">{pm.icon}</span>
+                          <div className="flex-1">
+                            <p className="font-medium">{name}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {t(`checkout.paymentMethodDesc.${pm.id}`)}
+                            </p>
+                          </div>
+                          {isSelected && (
+                            <Check className="w-5 h-5 text-primary shrink-0" />
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
                   <div className="flex gap-4 mt-6">
                     <button

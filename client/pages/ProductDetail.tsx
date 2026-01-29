@@ -22,7 +22,6 @@ export default function ProductDetail() {
   if (!product) {
     return (
       <div className="min-h-screen">
-        <Header />
         <div className="container-apple py-20 text-center">
           <h1 className="text-2xl font-bold mb-4">{t("productDetail.notFound")}</h1>
           <Link to="/products" className="btn-primary">
@@ -276,7 +275,7 @@ export default function ProductDetail() {
         <section className="py-8 sm:py-12 border-t border-border bg-secondary/20">
           <div className="container-apple">
             <h2 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8">{t("productDetail.recommendedAccessories")}</h2>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+            <div className="grid grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
               {accessories.map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}
@@ -323,7 +322,7 @@ export default function ProductDetail() {
         <section className="py-8 sm:py-12 border-t border-border">
           <div className="container-apple">
             <h2 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8">{t("productDetail.youMightLike")}</h2>
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+            <div className="grid grid-cols-3 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
               {related.map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}

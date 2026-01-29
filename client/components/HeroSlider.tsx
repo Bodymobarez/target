@@ -9,7 +9,7 @@ const slides = [
   { id: "macbook", image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=1200&q=85" },
   { id: "imac", image: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=1200&q=85" },
   { id: "ipad", image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=1200&q=85" },
-  { id: "airpods", image: "https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=1200&q=85" },
+  { id: "airpods", image: "https://images.unsplash.com/photo-1587523459887-e669248cf666?w=1200&q=85" },
   { id: "macbookAir", image: "https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=1200&q=85" },
 ];
 

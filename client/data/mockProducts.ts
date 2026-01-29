@@ -10,13 +10,15 @@ const IMG = {
   ipad2: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&h=800&fit=crop",
   watch: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&h=800&fit=crop",
   watch2: "https://images.unsplash.com/photo-1434493789847-2f02dc6ca35d?w=800&h=800&fit=crop",
-  airpods: "https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=800&h=800&fit=crop",
-  airpods2: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&h=800&fit=crop",
-  airpodsMax: "https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=800&h=800&fit=crop",
+  // AirPods حقيقية - صور منتج من Unsplash
+  airpods: "https://images.unsplash.com/photo-1587523459887-e669248cf666?w=800&h=800&fit=crop",
+  airpods2: "https://images.unsplash.com/photo-1624258919367-5dc28f5dc293?w=800&h=800&fit=crop",
+  airpodsMax: "https://images.unsplash.com/photo-1611864583067-b002fdc4fa29?w=800&h=800&fit=crop",
   imac: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=800&h=800&fit=crop",
   appletv: "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=800&h=800&fit=crop",
-  charger: "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=800&h=800&fit=crop",
-  cable: "https://images.unsplash.com/photo-1625726411847-7c2ea23db30b?w=800&h=800&fit=crop",
+  // شاحن لابتوب أبل + كابل آيفون (صور حقيقية)
+  charger: "https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=800&h=800&fit=crop",
+  cable: "https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=800&h=800&fit=crop",
   case: "https://images.unsplash.com/photo-1601593346742-7a179b641c2d?w=800&h=800&fit=crop",
   keyboard: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800&h=800&fit=crop",
   pencil: "https://images.unsplash.com/photo-1624823183494-4d711f2f1a6c?w=800&h=800&fit=crop",
@@ -30,9 +32,10 @@ export const categories: Category[] = [
   { id: "macbook", name: "MacBook", slug: "macbook", description: "Supercharged by Apple Silicon.", productCount: 4, image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600&h=600&fit=crop" },
   { id: "imac", name: "iMac", slug: "imac", description: "Stunning. All-in-one.", productCount: 1, image: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=600&h=600&fit=crop" },
   { id: "watch", name: "Apple Watch", slug: "watch", description: "The ultimate device for a healthy life.", productCount: 3, image: "https://images.unsplash.com/photo-1434493789847-2f02dc6ca35d?w=600&h=600&fit=crop" },
-  { id: "airpods", name: "AirPods", slug: "airpods", description: "Sound that surrounds you.", productCount: 4, image: "https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=600&h=600&fit=crop" },
+  { id: "airpods", name: "AirPods", slug: "airpods", description: "Sound that surrounds you.", productCount: 4, image: "https://images.unsplash.com/photo-1587523459887-e669248cf666?w=600&h=600&fit=crop" },
   { id: "appletv", name: "Apple TV", slug: "appletv", description: "Cinema in your living room.", productCount: 1, image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=600&h=600&fit=crop" },
   { id: "accessories", name: "Accessories", slug: "accessories", description: "Chargers, USB cables, cases, MagSafe & more.", productCount: 28, image: "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=600&h=600&fit=crop" },
+  { id: "repair", name: "Repair", slug: "repair", description: "Laptops, mobiles & software.", productCount: 0, image: "https://images.unsplash.com/photo-1721333084062-71c1f242459a?w=600&h=600&fit=crop" },
 ];
 
 export const products: Product[] = [
@@ -553,46 +556,6 @@ export const products: Product[] = [
   },
   // ——— Accessories (real Apple) ———
   {
-    id: "magsafe-charger",
-    slug: "magsafe-charger",
-    name: "MagSafe Charger",
-    categoryId: "accessories",
-    categoryName: "Accessories",
-    description: "Fast wireless charging for iPhone 12 and later. Snap on. Up to 15W. Compatible with Qi-enabled devices.",
-    shortDescription: "Up to 15W. Snap on.",
-    price: 39,
-    currency: "USD",
-    images: [IMG.charger],
-    rating: 4.5,
-    reviewCount: 5234,
-    specs: [
-      { label: "Output", value: "Up to 15W for MagSafe, 7.5W for Qi" },
-      { label: "Compatibility", value: "iPhone 12 and later, AirPods with MagSafe case" },
-    ],
-    colors: [{ name: "White", hex: "#f5f5f5" }],
-    inStock: true,
-  },
-  {
-    id: "magsafe-battery-pack",
-    slug: "magsafe-battery-pack",
-    name: "MagSafe Battery Pack",
-    categoryId: "accessories",
-    categoryName: "Accessories",
-    description: "Portable power for iPhone 12 and later. Snap on. 1,460mAh. Charges iPhone and the pack together.",
-    shortDescription: "Portable. Snap on.",
-    price: 99,
-    currency: "USD",
-    images: [IMG.charger],
-    rating: 4.4,
-    reviewCount: 3456,
-    specs: [
-      { label: "Capacity", value: "1,460mAh, 11.13Wh" },
-      { label: "Compatibility", value: "iPhone 12 and later" },
-    ],
-    colors: [{ name: "White", hex: "#f5f5f5" }],
-    inStock: true,
-  },
-  {
     id: "apple-pencil-pro",
     slug: "apple-pencil-pro",
     name: "Apple Pencil Pro",
@@ -837,6 +800,7 @@ export const products: Product[] = [
     ],
     colors: [{ name: "White", hex: "#f5f5f5" }],
     inStock: true,
+    badge: "Premium",
   },
   {
     id: "usb-c-adapter-96w",
@@ -879,26 +843,6 @@ export const products: Product[] = [
     inStock: true,
   },
   // ——— Apple USB Cables (كابلات يو اس بي ابل) ———
-  {
-    id: "usb-c-to-lightning-1m",
-    slug: "usb-c-to-lightning-1m",
-    name: "USB-C to Lightning Cable (1m)",
-    categoryId: "accessories",
-    categoryName: "Accessories",
-    description: "Charge and sync. USB-C to Lightning. 1 meter. Fast charging compatible. For iPhone, iPad, AirPods.",
-    shortDescription: "1m. Fast charge.",
-    price: 25,
-    currency: "USD",
-    images: [IMG.cable],
-    rating: 4.6,
-    reviewCount: 9876,
-    specs: [
-      { label: "Length", value: "1m" },
-      { label: "Compatibility", value: "iPhone, iPad, AirPods (Lightning)" },
-    ],
-    colors: [{ name: "White", hex: "#f5f5f5" }],
-    inStock: true,
-  },
   {
     id: "usb-c-to-usb-c-2m",
     slug: "usb-c-to-usb-c-2m",
@@ -1110,5 +1054,9 @@ export function getProductsByCategory(categoryId: string): Product[] {
 }
 
 export function getFeaturedProducts(): Product[] {
-  return products.filter((p) => p.badge).slice(0, 8);
+  const featuredIds = new Set<string>([]);
+  const withBadge = products.filter((p) => p.badge);
+  const priority = withBadge.filter((p) => featuredIds.has(p.id));
+  const rest = withBadge.filter((p) => !featuredIds.has(p.id));
+  return [...priority, ...rest].slice(0, 8);
 }

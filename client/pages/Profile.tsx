@@ -1,5 +1,6 @@
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { useLanguage } from "@/context/LanguageContext";
+import { useAuth } from "@/context/AuthContext";
 import { User, ShoppingBag, Heart, Settings, LogOut, Truck, ExternalLink } from "lucide-react";
 import { mockUserOrders } from "@/data/mockOrders";
 import { cn } from "@/lib/utils";
@@ -14,6 +15,18 @@ const statusColorKeys: Record<string, string> = {
 
 export default function Profile() {
   const { t, formatPriceFromUsd } = useLanguage();
+  const { user, loading, logout } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-muted-foreground">{t("loading")}</p>
+      </div>
+    );
+  }
+  if (!user) {
+    return <Navigate to="/signin" replace />;
+  }
   const statusLabels: Record<string, string> = {
     pending: t("admin.pending"),
     confirmed: t("admin.processing"),
@@ -51,9 +64,11 @@ export default function Profile() {
                 <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
                   <User className="w-8 h-8 text-primary-foreground" />
                 </div>
-                <h2 className="text-2xl font-bold text-center mb-2">John Doe</h2>
+                <h2 className="text-2xl font-bold text-center mb-2">
+                  {user.name || user.email}
+                </h2>
                 <p className="text-center text-muted-foreground text-sm">
-                  john@example.com
+                  {user.email}
                 </p>
               </div>
 
@@ -80,9 +95,13 @@ export default function Profile() {
                 })}
               </nav>
 
-              <button className="w-full card-premium p-4 rounded-xl flex items-center gap-3 text-destructive hover:bg-destructive/10 motion-smooth mt-6">
+              <button
+                type="button"
+                onClick={logout}
+                className="w-full card-premium p-4 rounded-xl flex items-center gap-3 text-destructive hover:bg-destructive/10 motion-smooth mt-6"
+              >
                 <LogOut className="w-5 h-5" />
-                <span className="font-medium">{t("profile.signOut")}</span>
+                <span className="font-medium">{t("auth.signOut")}</span>
               </button>
             </div>
 

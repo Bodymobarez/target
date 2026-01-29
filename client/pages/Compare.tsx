@@ -14,7 +14,6 @@ export default function Compare() {
   if (products.length === 0) {
     return (
       <div className="min-h-screen">
-        <Header />
         <section className="section-padding">
           <div className="container-apple text-center">
             <h1 className="text-4xl font-bold mb-4">{t("compare.title")}</h1>

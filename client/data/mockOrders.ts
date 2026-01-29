@@ -34,7 +34,7 @@ export const mockUserOrders: MockOrder[] = [
     trackingNumber: "1Z999AA10123456785",
     trackingUrl: "https://www.ups.com/track?tracknum=1Z999AA10123456785",
     items: [
-      { name: "AirPods Pro (2nd gen)", quantity: 1, price: 249, image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop" },
+      { name: "AirPods Pro (2nd gen)", quantity: 1, price: 249, image: "https://images.unsplash.com/photo-1624258919367-5dc28f5dc293?w=200&h=200&fit=crop" },
     ],
   },
   {

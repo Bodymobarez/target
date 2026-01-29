@@ -1,5 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/context/LanguageContext";
+import { Plus, Search, Pencil, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -8,11 +11,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Search, Eye, Truck, Plus, Pencil, Trash2 } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { useLanguage } from "@/context/LanguageContext";
 import {
   Dialog,
   DialogContent,
@@ -30,84 +28,87 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 
-type OrderRow = {
+type PurchaseRow = {
   id: string;
-  customer: string;
+  supplier: string;
   total: number;
+  currency: string;
   status: string;
   date: string;
-  tracking: string | null;
 };
 
-const statusOptions = ["pending", "processing", "shipped", "delivered", "cancelled"] as const;
+const statusOptions = ["PENDING", "ORDERED", "PARTIAL", "RECEIVED", "CANCELLED"] as const;
 
-const initialOrders: OrderRow[] = [
-  { id: "ORD-2847", customer: "John Doe", total: 1199, status: "shipped", date: "2025-01-29", tracking: "1Z999AA10123456784" },
-  { id: "ORD-2846", customer: "Jane Smith", total: 249, status: "delivered", date: "2025-01-28", tracking: "1Z999AA10123456785" },
-  { id: "ORD-2845", customer: "Ahmed Ali", total: 3499, status: "processing", date: "2025-01-28", tracking: null },
-  { id: "ORD-2844", customer: "Sara Lee", total: 799, status: "pending", date: "2025-01-27", tracking: null },
+const initialPurchases: PurchaseRow[] = [
+  {
+    id: "PO-001",
+    supplier: "Apple Inc.",
+    total: 50000,
+    currency: "USD",
+    status: "RECEIVED",
+    date: "2025-01-20",
+  },
+  {
+    id: "PO-002",
+    supplier: "Tech Distributors",
+    total: 12000,
+    currency: "USD",
+    status: "PENDING",
+    date: "2025-01-25",
+  },
 ];
 
-const statusColors: Record<string, string> = {
-  pending: "bg-amber-500/20 text-amber-700 dark:text-amber-400",
-  processing: "bg-blue-500/20 text-blue-700 dark:text-blue-400",
-  shipped: "bg-purple-500/20 text-purple-700 dark:text-purple-400",
-  delivered: "bg-green-500/20 text-green-700 dark:text-green-400",
-  cancelled: "bg-red-500/20 text-red-700 dark:text-red-400",
+const statusKeys: Record<string, string> = {
+  PENDING: "admin.pending",
+  ORDERED: "Ordered",
+  PARTIAL: "Partial",
+  RECEIVED: "admin.delivered",
+  CANCELLED: "admin.cancelled",
 };
 
-const statusLabel: Record<string, string> = {
-  pending: "admin.pending",
-  processing: "admin.processing",
-  shipped: "admin.shipped",
-  delivered: "admin.delivered",
-  cancelled: "admin.cancelled",
-};
-
-export default function AdminOrders() {
-  const { t, formatPriceFromUsd } = useLanguage();
-  const navigate = useNavigate();
+export default function AdminPurchases() {
+  const { t } = useLanguage();
   const [search, setSearch] = useState("");
-  const [list, setList] = useState<OrderRow[]>(initialOrders);
   const [open, setOpen] = useState(false);
-  const [viewOrder, setViewOrder] = useState<OrderRow | null>(null);
+  const [list, setList] = useState<PurchaseRow[]>(initialPurchases);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [form, setForm] = useState({
-    customer: "",
+    supplier: "",
     total: "",
-    status: "pending",
+    currency: "USD",
+    status: "PENDING",
     date: new Date().toISOString().slice(0, 10),
-    tracking: "",
   });
 
   const filtered = list.filter(
-    (o) =>
-      o.id.toLowerCase().includes(search.toLowerCase()) ||
-      o.customer.toLowerCase().includes(search.toLowerCase())
+    (p) =>
+      p.id.toLowerCase().includes(search.toLowerCase()) ||
+      p.supplier.toLowerCase().includes(search.toLowerCase())
   );
 
   const openAdd = () => {
     setEditingId(null);
     setForm({
-      customer: "",
+      supplier: "",
       total: "",
-      status: "pending",
+      currency: "USD",
+      status: "PENDING",
       date: new Date().toISOString().slice(0, 10),
-      tracking: "",
     });
     setOpen(true);
   };
 
-  const openEdit = (o: OrderRow) => {
-    setEditingId(o.id);
+  const openEdit = (p: PurchaseRow) => {
+    setEditingId(p.id);
     setForm({
-      customer: o.customer,
-      total: String(o.total),
-      status: o.status,
-      date: o.date,
-      tracking: o.tracking ?? "",
+      supplier: p.supplier,
+      total: String(p.total),
+      currency: p.currency,
+      status: p.status,
+      date: p.date,
     });
     setOpen(true);
   };
@@ -115,33 +116,32 @@ export default function AdminOrders() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const total = parseFloat(form.total) || 0;
-    const tracking = form.tracking.trim() || null;
     if (editingId) {
       setList((prev) =>
         prev.map((item) =>
           item.id === editingId
             ? {
                 ...item,
-                customer: form.customer,
+                supplier: form.supplier,
                 total,
+                currency: form.currency,
                 status: form.status,
                 date: form.date,
-                tracking,
               }
             : item
         )
       );
     } else {
-      const id = `ORD-${2840 + list.length + 1}`;
+      const id = `PO-${String(list.length + 1).padStart(3, "0")}-${Date.now().toString(36).slice(-4)}`;
       setList((prev) => [
         ...prev,
         {
           id,
-          customer: form.customer,
+          supplier: form.supplier,
           total,
+          currency: form.currency,
           status: form.status,
           date: form.date,
-          tracking,
         },
       ]);
     }
@@ -149,19 +149,19 @@ export default function AdminOrders() {
   };
 
   const handleDelete = (id: string) => {
-    setList((prev) => prev.filter((o) => o.id !== id));
+    setList((prev) => prev.filter((p) => p.id !== id));
     setDeleteId(null);
   };
 
   return (
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold">{t("admin.orders")}</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold">{t("admin.purchases")}</h1>
         <div className="flex items-center gap-4">
-          <div className="relative flex-1 sm:w-72">
+          <div className="relative flex-1 sm:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder={t("admin.searchOrders")}
+              placeholder={t("admin.searchPurchases")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-9"
@@ -170,27 +170,27 @@ export default function AdminOrders() {
           <Dialog open={open} onOpenChange={setOpen}>
             <Button className="gap-2" onClick={() => { openAdd(); setOpen(true); }}>
               <Plus className="w-4 h-4" />
-              {t("admin.addOrder")}
+              {t("admin.addPurchase")}
             </Button>
             <DialogContent className="max-w-lg">
               <DialogHeader>
                 <DialogTitle>
-                  {editingId ? t("admin.edit") : t("admin.addOrder")}
+                  {editingId ? t("admin.edit") : t("admin.addPurchase")}
                 </DialogTitle>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="grid gap-4 py-4">
                 <div className="grid gap-2">
-                  <Label>{t("admin.customer")}</Label>
+                  <Label>{t("admin.supplier")}</Label>
                   <Input
-                    value={form.customer}
-                    onChange={(e) => setForm((f) => ({ ...f, customer: e.target.value }))}
-                    placeholder="Customer name"
+                    value={form.supplier}
+                    onChange={(e) => setForm((f) => ({ ...f, supplier: e.target.value }))}
+                    placeholder="Supplier name"
                     required
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
-                    <Label>{t("total")}</Label>
+                    <Label>{t("admin.total")}</Label>
                     <Input
                       type="number"
                       min="0"
@@ -202,6 +202,20 @@ export default function AdminOrders() {
                     />
                   </div>
                   <div className="grid gap-2">
+                    <Label>{t("admin.columnPrice")}</Label>
+                    <select
+                      className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm"
+                      value={form.currency}
+                      onChange={(e) => setForm((f) => ({ ...f, currency: e.target.value }))}
+                    >
+                      <option value="USD">USD</option>
+                      <option value="SAR">SAR</option>
+                      <option value="EUR">EUR</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
                     <Label>{t("admin.status")}</Label>
                     <select
                       className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm"
@@ -210,13 +224,11 @@ export default function AdminOrders() {
                     >
                       {statusOptions.map((s) => (
                         <option key={s} value={s}>
-                          {t(statusLabel[s] ?? s)}
+                          {t(statusKeys[s] ?? s)}
                         </option>
                       ))}
                     </select>
                   </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
                     <Label>{t("admin.date")}</Label>
                     <Input
@@ -224,14 +236,6 @@ export default function AdminOrders() {
                       value={form.date}
                       onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
                       required
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label>{t("admin.trackingNumber")}</Label>
-                    <Input
-                      value={form.tracking}
-                      onChange={(e) => setForm((f) => ({ ...f, tracking: e.target.value }))}
-                      placeholder="Optional"
                     />
                   </div>
                 </div>
@@ -251,50 +255,38 @@ export default function AdminOrders() {
         <Table className="min-w-[640px]">
           <TableHeader>
             <TableRow>
-              <TableHead>{t("admin.orderId")}</TableHead>
-              <TableHead>{t("admin.customer")}</TableHead>
-              <TableHead>{t("admin.date")}</TableHead>
-              <TableHead>{t("total")}</TableHead>
+              <TableHead>PO #</TableHead>
+              <TableHead>{t("admin.supplier")}</TableHead>
+              <TableHead>{t("admin.columnPrice")}</TableHead>
               <TableHead>{t("admin.status")}</TableHead>
-              <TableHead className="w-32">{t("admin.actions")}</TableHead>
+              <TableHead>{t("admin.date")}</TableHead>
+              <TableHead className="w-24">{t("admin.actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filtered.map((order) => (
-              <TableRow key={order.id}>
-                <TableCell className="font-mono font-medium">{order.id}</TableCell>
-                <TableCell>{order.customer}</TableCell>
-                <TableCell>{order.date}</TableCell>
-                <TableCell>{formatPriceFromUsd(order.total)}</TableCell>
+            {filtered.map((p) => (
+              <TableRow key={p.id}>
+                <TableCell className="font-mono font-medium">{p.id}</TableCell>
+                <TableCell>{p.supplier}</TableCell>
                 <TableCell>
-                  <Badge className={statusColors[order.status] ?? "bg-secondary"}>
-                    {statusLabel[order.status] ? t(statusLabel[order.status]) : order.status}
-                  </Badge>
+                  {p.currency} {p.total.toLocaleString()}
                 </TableCell>
                 <TableCell>
+                  <Badge variant={p.status === "RECEIVED" ? "default" : "secondary"}>
+                    {t(statusKeys[p.status] ?? p.status)}
+                  </Badge>
+                </TableCell>
+                <TableCell>{p.date}</TableCell>
+                <TableCell>
                   <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      title={t("admin.view")}
-                      onClick={() => setViewOrder(order)}
-                    >
-                      <Eye className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      title={t("admin.goToDelivery")}
-                      onClick={() => navigate(`/admin/delivery?orderId=${order.id}`)}
-                    >
-                      <Truck className="w-4 h-4" />
+                    <Button variant="ghost" size="icon" onClick={() => openEdit(p)}>
+                      <Pencil className="w-4 h-4" />
                     </Button>
                     <Button
                       variant="ghost"
                       size="icon"
                       className="text-destructive"
-                      title={t("admin.delete")}
-                      onClick={() => setDeleteId(order.id)}
+                      onClick={() => setDeleteId(p.id)}
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
@@ -305,29 +297,6 @@ export default function AdminOrders() {
           </TableBody>
         </Table>
       </div>
-
-      {/* View order dialog */}
-      <Dialog open={!!viewOrder} onOpenChange={() => setViewOrder(null)}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>{t("admin.orderId")}: {viewOrder?.id}</DialogTitle>
-          </DialogHeader>
-          {viewOrder && (
-            <div className="grid gap-3 py-2">
-              <p><span className="font-medium">{t("admin.customer")}:</span> {viewOrder.customer}</p>
-              <p><span className="font-medium">{t("admin.date")}:</span> {viewOrder.date}</p>
-              <p><span className="font-medium">{t("total")}:</span> {formatPriceFromUsd(viewOrder.total)}</p>
-              <p>
-                <span className="font-medium">{t("admin.status")}:</span>{" "}
-                {statusLabel[viewOrder.status] ? t(statusLabel[viewOrder.status]) : viewOrder.status}
-              </p>
-              {viewOrder.tracking && (
-                <p><span className="font-medium">{t("admin.trackingNumber")}:</span> {viewOrder.tracking}</p>
-              )}
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
