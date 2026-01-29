@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import type { AuthUser, ApiRole } from "@shared/api";
 
 const JWT_SECRET = process.env.JWT_SECRET ?? "target-dev-secret-change-in-production";
