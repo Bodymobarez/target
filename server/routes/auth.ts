@@ -30,8 +30,23 @@ router.post("/register", async (req: Request<object, object, RegisterBody>, res:
     const token = signToken({ userId: user.id, email: user.email, role: user.role });
     res.status(201).json({ user: toAuthUser(user), token });
   } catch (e) {
-    console.error("auth register", e);
-    res.status(500).json({ error: "Internal server error" });
+    const err = e as Error & { code?: string };
+    console.error("auth register", err);
+    if (err.code === "P2021" || err.message?.includes("does not exist")) {
+      res.status(503).json({
+        error: "Service unavailable",
+        message: "Database not ready. Run: npx prisma migrate dev && npx prisma db seed. Or use demo login: admin@target.com / admin123",
+      });
+      return;
+    }
+    if (err.code === "P1001" || err.message?.includes("Can't reach database")) {
+      res.status(503).json({
+        error: "Service unavailable",
+        message: "Database unavailable. Set DATABASE_URL or use demo: admin@target.com / admin123",
+      });
+      return;
+    }
+    res.status(500).json({ error: "Internal server error", message: "Registration failed. Try demo: admin@target.com / admin123" });
   }
 });
 
