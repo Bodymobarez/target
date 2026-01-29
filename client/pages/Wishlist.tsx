@@ -1,4 +1,3 @@
-import Header from "@/components/Header";
 import { Link } from "react-router-dom";
 import { useWishlist } from "@/context/WishlistContext";
 import { useLanguage } from "@/context/LanguageContext";
@@ -16,8 +15,6 @@ export default function Wishlist() {
 
   return (
     <div className="min-h-screen">
-      <Header />
-
       <section className="section-padding border-b border-border bg-secondary/20">
         <div className="container-apple">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-2">

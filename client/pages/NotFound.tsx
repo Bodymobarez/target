@@ -1,6 +1,5 @@
 import { useLocation, Link } from "react-router-dom";
 import { useEffect } from "react";
-import Header from "@/components/Header";
 import { useLanguage } from "@/context/LanguageContext";
 
 const NotFound = () => {
@@ -16,7 +15,6 @@ const NotFound = () => {
 
   return (
     <div className="min-h-screen">
-      <Header />
       <section className="flex-1 flex items-center justify-center py-20">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="mb-8">

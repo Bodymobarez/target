@@ -1,5 +1,4 @@
 import { useState } from "react";
-import Header from "@/components/Header";
 import { Link } from "react-router-dom";
 import { useCart } from "@/context/CartContext";
 import { useLanguage } from "@/context/LanguageContext";
@@ -43,7 +42,6 @@ export default function Checkout() {
   if (items.length === 0 && !orderPlaced) {
     return (
       <div className="min-h-screen">
-        <Header />
         <div className="container-apple py-20 text-center">
           <h1 className="text-2xl font-bold mb-4">{t("cart.empty")}</h1>
           <Link to="/products" className="btn-primary">
@@ -57,7 +55,6 @@ export default function Checkout() {
   if (orderPlaced) {
     return (
       <div className="min-h-screen">
-        <Header />
         <div className="container-apple py-20 text-center max-w-xl mx-auto">
           <div className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-6">
             <Check className="w-10 h-10 text-green-600" />
@@ -76,8 +73,6 @@ export default function Checkout() {
 
   return (
     <div className="min-h-screen">
-      <Header />
-
       <section className="py-8 sm:py-12 border-b border-border bg-secondary/20">
         <div className="container-apple">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6">

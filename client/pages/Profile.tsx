@@ -1,4 +1,3 @@
-import Header from "@/components/Header";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/context/LanguageContext";
 import { User, ShoppingBag, Heart, Settings, LogOut, Truck, ExternalLink } from "lucide-react";
@@ -37,8 +36,6 @@ export default function Profile() {
 
   return (
     <div className="min-h-screen">
-      <Header />
-
       <section className="py-8 sm:py-12 border-b border-border bg-secondary/30">
         <div className="container-apple">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold">{t("profile.title")}</h1>

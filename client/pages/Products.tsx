@@ -1,5 +1,4 @@
 import { useSearchParams, Link } from "react-router-dom";
-import Header from "@/components/Header";
 import ProductCard from "@/components/ProductCard";
 import { products, categories } from "@/data/mockProducts";
 import { SlidersHorizontal } from "lucide-react";
@@ -40,8 +39,6 @@ export default function Products() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-
       <section className="py-10 sm:py-14 md:py-20 border-b border-border/50 bg-secondary/20">
         <div className="container-apple">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-2 tracking-tight">

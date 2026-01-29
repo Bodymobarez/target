@@ -1,6 +1,5 @@
 import { useParams, Link } from "react-router-dom";
 import { useState } from "react";
-import Header from "@/components/Header";
 import ProductCard from "@/components/ProductCard";
 import { getProductById, products } from "@/data/mockProducts";
 import { useCart } from "@/context/CartContext";
@@ -66,8 +65,6 @@ export default function ProductDetail() {
 
   return (
     <div className="min-h-screen">
-      <Header />
-
       <section className="py-6 sm:py-8 md:py-12 border-b border-border">
         <div className="container-apple">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-16">

@@ -1,4 +1,3 @@
-import Header from "@/components/Header";
 import { Link } from "react-router-dom";
 import { Trash2, Plus, Minus, ArrowRight } from "lucide-react";
 import { useCart } from "@/context/CartContext";
@@ -25,8 +24,6 @@ export default function Cart() {
 
   return (
     <div className="min-h-screen">
-      <Header />
-
       <section className="py-8 sm:py-12 md:py-16 border-b border-border bg-secondary/20">
         <div className="container-apple">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold">{t("cart.title")}</h1>

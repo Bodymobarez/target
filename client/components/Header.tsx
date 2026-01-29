@@ -91,7 +91,8 @@ export default function Header() {
             ))}
           </nav>
 
-          <div className="relative flex items-center gap-1">
+          {/* أيقونات: مخفية على الموبايل (تظهر كتابس في الفوتر) */}
+          <div className="hidden md:flex relative items-center gap-1">
             <AnimatePresence mode="wait">
               {showSearch ? (
                 <motion.form
@@ -182,14 +183,15 @@ export default function Header() {
             <Link to="/profile" className={iconBtnClass} title={t("nav.profile")}>
               <User className="w-4 h-4 sm:w-5 sm:h-5" />
             </Link>
-
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className={cn("md:hidden", iconBtnClass)}
-            >
-              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" aria-hidden />}
-            </button>
           </div>
+
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className={cn("md:hidden", iconBtnClass)}
+            aria-label={isMobileMenuOpen ? "إغلاق القائمة" : "فتح القائمة"}
+          >
+            {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" aria-hidden />}
+          </button>
         </div>
 
         <AnimatePresence>

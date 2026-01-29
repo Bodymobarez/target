@@ -1,6 +1,4 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
-import Header from "@/components/Header";
 import ProductCard from "@/components/ProductCard";
 import HeroSlider from "@/components/HeroSlider";
 import { motion } from "framer-motion";
@@ -22,16 +20,12 @@ const item = {
   show: { opacity: 1, y: 0 },
 };
 
-type FooterTab = "shop" | "support" | "company" | "legal";
-
 export default function Index() {
   const { t } = useLanguage();
   const featured = getFeaturedProducts();
-  const [footerTab, setFooterTab] = useState<FooterTab>("shop");
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
+    <>
 
       {/* Hero — أصغر على الموبايل */}
       <section className="relative min-h-[55vh] sm:min-h-[65vh] md:min-h-[calc(100vh-5rem)] overflow-hidden">
@@ -205,127 +199,6 @@ export default function Index() {
           </motion.div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="border-t border-border/50 py-10 sm:py-12 md:py-16 bg-secondary/20">
-        <div className="container-apple">
-          {/* Mobile: tabs */}
-          <div className="md:hidden mb-8">
-            <div className="flex gap-1 p-1 rounded-xl bg-secondary/60 border border-border/50">
-              {(["shop", "support", "company", "legal"] as const).map((tab) => (
-                <button
-                  key={tab}
-                  type="button"
-                  onClick={() => setFooterTab(tab)}
-                  className={cn(
-                    "flex-1 py-2.5 px-2 rounded-lg text-xs font-medium smooth-transition",
-                    footerTab === tab
-                      ? "bg-background text-foreground shadow-sm border border-border/50"
-                      : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  {tab === "shop" && t("home.footerShop")}
-                  {tab === "support" && t("home.footerSupport")}
-                  {tab === "company" && t("home.footerCompany")}
-                  {tab === "legal" && t("home.footerLegal")}
-                </button>
-              ))}
-            </div>
-            <div className="mt-4">
-              {footerTab === "shop" && (
-                <ul className="space-y-2.5 text-sm text-muted-foreground">
-                  <li>
-                    <Link to="/products" className="hover:text-foreground smooth-transition block py-1">
-                      {t("home.allProducts")}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/products?category=iphone" className="hover:text-foreground smooth-transition block py-1">
-                      {t("nav.iphone")}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/products?category=macbook" className="hover:text-foreground smooth-transition block py-1">
-                      {t("nav.macbook")}
-                    </Link>
-                  </li>
-                </ul>
-              )}
-              {footerTab === "support" && (
-                <ul className="space-y-2.5 text-sm text-muted-foreground">
-                  <li><a href="#" className="hover:text-foreground smooth-transition block py-1">{t("home.help")}</a></li>
-                  <li><a href="#" className="hover:text-foreground smooth-transition block py-1">{t("home.contact")}</a></li>
-                  <li><a href="#" className="hover:text-foreground smooth-transition block py-1">{t("home.shipping")}</a></li>
-                </ul>
-              )}
-              {footerTab === "company" && (
-                <ul className="space-y-2.5 text-sm text-muted-foreground">
-                  <li><a href="#" className="hover:text-foreground smooth-transition block py-1">{t("home.about")}</a></li>
-                  <li><a href="#" className="hover:text-foreground smooth-transition block py-1">{t("home.careers")}</a></li>
-                </ul>
-              )}
-              {footerTab === "legal" && (
-                <ul className="space-y-2.5 text-sm text-muted-foreground">
-                  <li><a href="#" className="hover:text-foreground smooth-transition block py-1">{t("home.privacy")}</a></li>
-                  <li><a href="#" className="hover:text-foreground smooth-transition block py-1">{t("home.terms")}</a></li>
-                </ul>
-              )}
-            </div>
-          </div>
-
-          {/* Desktop: grid */}
-          <div className="hidden md:grid grid-cols-4 gap-6 sm:gap-8 md:gap-10 mb-8 sm:mb-12">
-            <div>
-              <h4 className="font-semibold text-foreground mb-4">{t("home.footerShop")}</h4>
-              <ul className="space-y-3 text-sm text-muted-foreground">
-                <li>
-                  <Link to="/products" className="hover:text-foreground smooth-transition">
-                    {t("home.allProducts")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/products?category=iphone" className="hover:text-foreground smooth-transition">
-                    {t("nav.iphone")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/products?category=macbook" className="hover:text-foreground smooth-transition">
-                    {t("nav.macbook")}
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-foreground mb-4">{t("home.footerSupport")}</h4>
-              <ul className="space-y-3 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground smooth-transition">{t("home.help")}</a></li>
-                <li><a href="#" className="hover:text-foreground smooth-transition">{t("home.contact")}</a></li>
-                <li><a href="#" className="hover:text-foreground smooth-transition">{t("home.shipping")}</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-foreground mb-4">{t("home.footerCompany")}</h4>
-              <ul className="space-y-3 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground smooth-transition">{t("home.about")}</a></li>
-                <li><a href="#" className="hover:text-foreground smooth-transition">{t("home.careers")}</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-foreground mb-4">{t("home.footerLegal")}</h4>
-              <ul className="space-y-3 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground smooth-transition">{t("home.privacy")}</a></li>
-                <li><a href="#" className="hover:text-foreground smooth-transition">{t("home.terms")}</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gold/20 pt-6 sm:pt-8 md:pt-10 flex flex-col md:flex-row items-center justify-between gap-4 text-xs sm:text-sm text-muted-foreground">
-            <div className="flex items-center justify-center gap-3">
-              <img src="/targ.png" alt="" className="h-9 w-auto opacity-95" />
-              <p>© {new Date().getFullYear()} {t("home.footerRights")}</p>
-            </div>
-          </div>
-        </div>
-      </footer>
-    </div>
+    </>
   );
 }
