@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { usdToEgp } from "@/lib/currency";
 import { EGYPT_PAYMENT_METHODS } from "@/data/egypt";
@@ -14,10 +15,14 @@ type Step = "shipping" | "payment" | "review";
 
 export default function Checkout() {
   const { items, clearCart } = useCart();
+  const { token } = useAuth();
   const { t, formatPrice, formatPriceFromUsd, locale } = useLanguage();
   const [step, setStep] = useState<Step>("shipping");
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [selectedPaymentId, setSelectedPaymentId] = useState<string>("cod");
+  const [placing, setPlacing] = useState(false);
+  const [placeError, setPlaceError] = useState<string | null>(null);
+  const [shippingAddress, setShippingAddress] = useState({ fullName: "", email: "", address: "", governorate: "", zip: "" });
 
   const subtotalUsd = items.reduce((s, i) => s + i.price * i.quantity, 0);
   const subtotalEgp = items.reduce(
@@ -36,9 +41,36 @@ export default function Checkout() {
   ];
   const stepIndex = steps.findIndex((s) => s.id === step);
 
-  const handlePlaceOrder = () => {
-    setOrderPlaced(true);
-    clearCart();
+  const handlePlaceOrder = async () => {
+    setPlaceError(null);
+    setPlacing(true);
+    try {
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        body: JSON.stringify({
+          items: items.map((i) => ({ productId: i.productId, name: i.name, price: usdToEgp(i.price), quantity: i.quantity, image: i.image, color: i.color })),
+          subtotal: subtotalEgp,
+          shipping,
+          tax,
+          total,
+          currency: "EGP",
+          shippingAddress: { ...shippingAddress, country: "Egypt" },
+          paymentMethod: selectedPaymentId,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setPlaceError(data?.message ?? t("error"));
+        setPlacing(false);
+        return;
+      }
+      setOrderPlaced(true);
+      clearCart();
+    } catch {
+      setPlaceError(t("error"));
+    }
+    setPlacing(false);
   };
 
   if (items.length === 0 && !orderPlaced) {
@@ -122,27 +154,37 @@ export default function Checkout() {
                     <input
                       type="text"
                       placeholder={t("checkout.fullName")}
+                      value={shippingAddress.fullName}
+                      onChange={(e) => setShippingAddress((s) => ({ ...s, fullName: e.target.value }))}
                       className="w-full px-4 py-3 rounded-xl border border-border bg-background"
                     />
                     <input
                       type="email"
                       placeholder={t("checkout.email")}
+                      value={shippingAddress.email}
+                      onChange={(e) => setShippingAddress((s) => ({ ...s, email: e.target.value }))}
                       className="w-full px-4 py-3 rounded-xl border border-border bg-background"
                     />
                     <input
                       type="text"
                       placeholder={t("checkout.address")}
+                      value={shippingAddress.address}
+                      onChange={(e) => setShippingAddress((s) => ({ ...s, address: e.target.value }))}
                       className="w-full px-4 py-3 rounded-xl border border-border bg-background"
                     />
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <input
                         type="text"
                         placeholder={t("checkout.governorate")}
+                        value={shippingAddress.governorate}
+                        onChange={(e) => setShippingAddress((s) => ({ ...s, governorate: e.target.value }))}
                         className="w-full px-4 py-3 rounded-xl border border-border bg-background"
                       />
                       <input
                         type="text"
                         placeholder={t("checkout.zip")}
+                        value={shippingAddress.zip}
+                        onChange={(e) => setShippingAddress((s) => ({ ...s, zip: e.target.value }))}
                         className="w-full px-4 py-3 rounded-xl border border-border bg-background"
                       />
                     </div>
@@ -285,14 +327,18 @@ export default function Checkout() {
                   <span>{formatPrice(total)}</span>
                 </div>
                 {step === "review" && (
-                  <button
-                    type="button"
-                    onClick={handlePlaceOrder}
-                    className="btn-primary w-full py-4 flex items-center justify-center gap-2"
-                  >
-                    {t("checkout.placeOrder")}
-                    <Check className="w-5 h-5" />
-                  </button>
+                  <>
+                    {placeError && <p className="text-destructive text-sm mb-2">{placeError}</p>}
+                    <button
+                      type="button"
+                      disabled={placing}
+                      onClick={handlePlaceOrder}
+                      className="btn-primary w-full py-4 flex items-center justify-center gap-2 disabled:opacity-70"
+                    >
+                      {placing ? t("loading") : t("checkout.placeOrder")}
+                      <Check className="w-5 h-5" />
+                    </button>
+                  </>
                 )}
                 <Link
                   to="/cart"

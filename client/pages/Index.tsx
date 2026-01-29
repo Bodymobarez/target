@@ -1,11 +1,14 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import ProductCard from "@/components/ProductCard";
 import HeroSlider from "@/components/HeroSlider";
 import { motion } from "framer-motion";
 import { ChevronRight, Wrench } from "lucide-react";
-import { categories, getFeaturedProducts } from "@/data/mockProducts";
+import { categories as mockCategories, getFeaturedProducts as getMockFeatured } from "@/data/mockProducts";
+import { fetchCategories, fetchFeaturedProducts } from "@/lib/products-api";
 import { useLanguage } from "@/context/LanguageContext";
 import { cn } from "@/lib/utils";
+import type { Product, Category } from "@shared/types";
 
 const container = {
   hidden: { opacity: 0 },
@@ -22,7 +25,12 @@ const item = {
 
 export default function Index() {
   const { t } = useLanguage();
-  const featured = getFeaturedProducts();
+  const [categories, setCategories] = useState<Category[]>(mockCategories);
+  const [featured, setFeatured] = useState<Product[]>(getMockFeatured());
+  useEffect(() => {
+    fetchCategories().then(setCategories);
+    fetchFeaturedProducts().then(setFeatured);
+  }, []);
 
   return (
     <>

@@ -1,8 +1,9 @@
+import { useState, useEffect } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { useLanguage } from "@/context/LanguageContext";
 import { useAuth } from "@/context/AuthContext";
 import { User, ShoppingBag, Heart, Settings, LogOut, Truck, ExternalLink } from "lucide-react";
-import { mockUserOrders } from "@/data/mockOrders";
+import { mockUserOrders, type MockOrder } from "@/data/mockOrders";
 import { cn } from "@/lib/utils";
 
 const statusColorKeys: Record<string, string> = {
@@ -13,9 +14,32 @@ const statusColorKeys: Record<string, string> = {
   cancelled: "bg-muted text-muted-foreground",
 };
 
+function apiOrderToMock(o: { id: string; status: string; total: number; createdAt: string; shippedAt?: string; trackingNumber?: string; items: { name: string; quantity: number; price: number; image?: string }[] }): MockOrder {
+  return {
+    id: o.id,
+    status: o.status as MockOrder["status"],
+    total: o.total,
+    itemCount: o.items.reduce((s, i) => s + i.quantity, 0),
+    createdAt: o.createdAt,
+    shippedAt: o.shippedAt,
+    trackingNumber: o.trackingNumber,
+    items: o.items.map((i) => ({ name: i.name, quantity: i.quantity, price: i.price, image: i.image ?? "" })),
+  };
+}
+
 export default function Profile() {
   const { t, formatPriceFromUsd } = useLanguage();
-  const { user, loading, logout } = useAuth();
+  const { user, token, loading, logout } = useAuth();
+  const [orders, setOrders] = useState<MockOrder[]>(mockUserOrders);
+
+  useEffect(() => {
+    if (!token) return;
+    fetch("/api/orders/me", { headers: { Authorization: `Bearer ${token}` } })
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data) => (Array.isArray(data) && data.length ? data.map(apiOrderToMock) : mockUserOrders))
+      .then(setOrders)
+      .catch(() => setOrders(mockUserOrders));
+  }, [token]);
 
   if (loading) {
     return (
@@ -41,7 +65,7 @@ export default function Profile() {
       icon: ShoppingBag,
       labelKey: "profile.orderHistory",
       href: "#orders",
-      badge: String(mockUserOrders.length),
+      badge: String(orders.length),
     },
     { icon: Heart, labelKey: "profile.wishlist", href: "/wishlist", badge: null },
     { icon: Settings, labelKey: "profile.settings", href: "#", badge: null },
@@ -111,7 +135,7 @@ export default function Profile() {
                 {t("profile.orderHistory")}
               </h2>
               <div className="space-y-4">
-                {mockUserOrders.map((order) => (
+                {orders.map((order) => (
                   <div key={order.id} className="card-premium p-6 rounded-2xl">
                     <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
                       <div>

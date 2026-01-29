@@ -1,23 +1,35 @@
 import { useParams, Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ProductCard from "@/components/ProductCard";
-import { getProductById, products } from "@/data/mockProducts";
+import { getProductById as getMockProductById, products as mockProducts } from "@/data/mockProducts";
+import { fetchProductById, fetchProducts } from "@/lib/products-api";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { ShoppingCart, Heart, Share2, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { Product } from "@shared/types";
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const { t, formatPriceFromUsd } = useLanguage();
-  const product = id ? getProductById(id) : undefined;
+  const [product, setProduct] = useState<Product | null>(id ? getMockProductById(id) ?? null : null);
+  const [allProducts, setAllProducts] = useState<Product[]>(mockProducts);
   const [quantity, setQuantity] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [addedToCart, setAddedToCart] = useState(false);
   const [selectedColor, setSelectedColor] = useState(product?.colors[0]?.name);
   const { addItem } = useCart();
   const { has, toggle } = useWishlist();
+
+  useEffect(() => {
+    if (id) fetchProductById(id).then((p) => p && setProduct(p));
+    fetchProducts().then((d) => setAllProducts(d.products));
+  }, [id]);
+
+  useEffect(() => {
+    if (product) setSelectedColor(product.colors[0]?.name);
+  }, [product]);
 
   if (!product) {
     return (
@@ -48,11 +60,11 @@ export default function ProductDetail() {
     setTimeout(() => setAddedToCart(false), 2000);
   };
 
-  const related = products
+  const related = allProducts
     .filter((p) => p.categoryId === product.categoryId && p.id !== product.id)
     .slice(0, 3);
 
-  const accessories = products
+  const accessories = allProducts
     .filter((p) => p.categoryId === "accessories")
     .slice(0, 4);
 

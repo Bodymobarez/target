@@ -1,10 +1,12 @@
 import { useSearchParams, Link, useNavigate } from "react-router-dom";
 import ProductCard from "@/components/ProductCard";
-import { products, categories } from "@/data/mockProducts";
+import { products as mockProducts, categories as mockCategories } from "@/data/mockProducts";
+import { fetchProducts, fetchCategories } from "@/lib/products-api";
 import { SlidersHorizontal, Wrench } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
+import type { Product, Category } from "@shared/types";
 
 export default function Products() {
   const { t } = useLanguage();
@@ -14,10 +16,17 @@ export default function Products() {
   const searchQuery = searchParams.get("q") ?? "";
   const [priceSort, setPriceSort] = useState<"default" | "asc" | "desc">("default");
   const [showFilters, setShowFilters] = useState(false);
+  const [products, setProducts] = useState<Product[]>(mockProducts);
+  const [categories, setCategories] = useState<Category[]>(mockCategories);
 
   useEffect(() => {
     if (categoryParam === "repair") navigate("/repair", { replace: true });
   }, [categoryParam, navigate]);
+
+  useEffect(() => {
+    fetchCategories().then(setCategories);
+    fetchProducts({ category: categoryParam || undefined, q: searchQuery || undefined }).then((d) => setProducts(d.products));
+  }, [categoryParam, searchQuery]);
 
   if (categoryParam === "repair") return null;
 

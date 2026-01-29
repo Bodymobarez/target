@@ -6,6 +6,31 @@ export interface AuthRequest extends Request {
   user?: { id: string; email: string; name: string | null; role: string };
 }
 
+async function setUserFromToken(req: AuthRequest, token: string | undefined): Promise<boolean> {
+  if (!token) return false;
+  const payload = verifyToken(token);
+  if (!payload) return false;
+  if (payload.userId === "demo-admin") {
+    req.user = { id: payload.userId, email: payload.email, name: "Admin", role: payload.role };
+    return true;
+  }
+  try {
+    const user = await prisma.user.findUnique({ where: { id: payload.userId } });
+    if (!user) return false;
+    req.user = { id: user.id, email: user.email, name: user.name, role: user.role };
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function optionalAuth(req: AuthRequest, _res: Response, next: NextFunction): Promise<void> {
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : (req.body?.token ?? req.query?.token);
+  await setUserFromToken(req, token as string | undefined);
+  next();
+}
+
 export async function requireAuth(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
   const authHeader = req.headers.authorization;
   const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : (req.body?.token ?? req.query?.token);
@@ -15,27 +40,9 @@ export async function requireAuth(req: AuthRequest, res: Response, next: NextFun
     return;
   }
 
-  const payload = verifyToken(token as string);
-  if (!payload) {
+  const ok = await setUserFromToken(req, token as string);
+  if (!ok) {
     res.status(401).json({ error: "Unauthorized", message: "Invalid or expired token" });
-    return;
-  }
-
-  if (payload.userId === "demo-admin") {
-    req.user = { id: payload.userId, email: payload.email, name: "Admin", role: payload.role };
-    return next();
-  }
-
-  try {
-    const user = await prisma.user.findUnique({ where: { id: payload.userId } });
-    if (!user) {
-      res.status(401).json({ error: "Unauthorized", message: "User not found" });
-      return;
-    }
-    req.user = { id: user.id, email: user.email, name: user.name, role: user.role };
-  } catch (e) {
-    console.error("requireAuth prisma", e);
-    res.status(503).json({ error: "Service unavailable", message: "Database unavailable" });
     return;
   }
   next();

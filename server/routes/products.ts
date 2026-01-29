@@ -1,39 +1,129 @@
 import { RequestHandler } from "express";
+import { prisma } from "../lib/prisma";
+import { Decimal } from "@prisma/client/runtime/library";
 
-// In-memory mock for API (replace with DB/Prisma later)
-const categories = [
-  { id: "iphone", name: "iPhone", slug: "iphone", description: "Powerful. Beautiful.", productCount: 8 },
-  { id: "ipad", name: "iPad", slug: "ipad", description: "Magic happens here.", productCount: 6 },
-  { id: "macbook", name: "MacBook", slug: "macbook", description: "Supercharged by Apple Silicon.", productCount: 6 },
-  { id: "watch", name: "Apple Watch", slug: "watch", description: "The ultimate device for a healthy life.", productCount: 4 },
-  { id: "airpods", name: "AirPods", slug: "airpods", description: "Sound that surrounds you.", productCount: 4 },
-  { id: "accessories", name: "Accessories", slug: "accessories", description: "Chargers, cases, MagSafe & more.", productCount: 12 },
-];
+function toNumber(d: Decimal | null | undefined): number {
+  if (d == null) return 0;
+  return Number(d);
+}
 
-const products = [
-  { id: "1", slug: "iphone-15-pro-max", name: "iPhone 15 Pro Max", categoryId: "iphone", categoryName: "iPhone", price: 1199, originalPrice: 1299, rating: 4.8, reviewCount: 2543, inStock: true, badge: "New", images: ["https://images.unsplash.com/photo-1592286927505-1def25e5df75?w=800&h=800&fit=crop"], specs: [{ label: "Display", value: "6.7\" Super Retina XDR" }, { label: "Chip", value: "A17 Pro" }], colors: [{ name: "Black Titanium", hex: "#1a1a1a" }] },
-  { id: "2", slug: "iphone-15-pro", name: "iPhone 15 Pro", categoryId: "iphone", categoryName: "iPhone", price: 999, originalPrice: 1099, rating: 4.7, reviewCount: 1834, inStock: true, badge: "New", images: ["https://images.unsplash.com/photo-1592286927505-1def25e5df75?w=800&h=800&fit=crop"], specs: [], colors: [] },
-  { id: "3", slug: "macbook-pro-16", name: "MacBook Pro 16\"", categoryId: "macbook", categoryName: "MacBook", price: 3499, rating: 4.9, reviewCount: 1245, inStock: true, badge: "Pro", images: ["https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&h=800&fit=crop"], specs: [], colors: [] },
-  { id: "8", slug: "airpods-pro-2", name: "AirPods Pro (2nd gen)", categoryId: "airpods", categoryName: "AirPods", price: 249, rating: 4.7, reviewCount: 3421, inStock: true, badge: "Best Seller", images: ["https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&h=800&fit=crop"], specs: [], colors: [] },
-  { id: "9", slug: "mag-safe-charger", name: "MagSafe Charger", categoryId: "accessories", categoryName: "Accessories", price: 39, rating: 4.5, reviewCount: 4521, inStock: true, images: ["https://images.unsplash.com/photo-1583394838336-acd977736f90?w=800&h=800&fit=crop"], specs: [], colors: [] },
-];
+function productToApi(p: {
+  id: string;
+  slug: string;
+  name: string;
+  categoryId: string;
+  category: { slug: string; name: string };
+  description: string;
+  shortDescription: string | null;
+  price: Decimal;
+  originalPrice: Decimal | null;
+  currency: string;
+  badge: string | null;
+  inStock: boolean;
+  rating: Decimal;
+  reviewCount: number;
+  videoUrl: string | null;
+  images: { url: string }[];
+  specs: { label: string; value: string }[];
+  colors: { name: string; hex: string }[];
+}) {
+  return {
+    id: p.id,
+    slug: p.slug,
+    name: p.name,
+    categoryId: p.category.slug,
+    categoryName: p.category.name,
+    description: p.description,
+    shortDescription: p.shortDescription ?? "",
+    price: toNumber(p.price),
+    originalPrice: p.originalPrice != null ? toNumber(p.originalPrice) : undefined,
+    currency: p.currency,
+    badge: p.badge ?? undefined,
+    inStock: p.inStock,
+    rating: toNumber(p.rating),
+    reviewCount: p.reviewCount,
+    videoUrl: p.videoUrl ?? undefined,
+    images: p.images.map((i) => i.url),
+    specs: p.specs,
+    colors: p.colors,
+  };
+}
 
-export const getProducts: RequestHandler = (req, res) => {
-  const category = req.query.category as string | undefined;
-  const q = (req.query.q as string)?.toLowerCase();
-  let list = products;
-  if (category) list = list.filter((p) => p.categoryId === category);
-  if (q) list = list.filter((p) => p.name.toLowerCase().includes(q) || p.categoryName.toLowerCase().includes(q));
-  res.json({ products: list, total: list.length });
+const productInclude = {
+  category: { select: { slug: true, name: true } },
+  images: { orderBy: { sortOrder: "asc" }, select: { url: true } },
+  specs: { select: { label: true, value: true } },
+  colors: { select: { name: true, hex: true } },
+} as const;
+
+export const getProducts: RequestHandler = async (req, res) => {
+  try {
+    const categorySlug = req.query.category as string | undefined;
+    const q = (req.query.q as string)?.trim()?.toLowerCase();
+    const where: { category?: { slug: string }; OR?: unknown[] } = {};
+    if (categorySlug) where.category = { slug: categorySlug };
+    if (q) where.OR = [{ name: { contains: q, mode: "insensitive" as const } }, { slug: { contains: q, mode: "insensitive" as const } }];
+    const list = await prisma.product.findMany({
+      where,
+      include: productInclude,
+    });
+    res.json({ products: list.map(productToApi), total: list.length });
+  } catch (e) {
+    console.error("getProducts", e);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
-export const getProductById: RequestHandler = (req, res) => {
-  const id = req.params.id;
-  const product = products.find((p) => p.id === id || p.slug === id);
-  if (!product) return res.status(404).json({ error: "Product not found" });
-  res.json(product);
+export const getProductById: RequestHandler = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const product = await prisma.product.findFirst({
+      where: { OR: [{ id }, { slug: id }] },
+      include: productInclude,
+    });
+    if (!product) {
+      res.status(404).json({ error: "Product not found" });
+      return;
+    }
+    res.json(productToApi(product));
+  } catch (e) {
+    console.error("getProductById", e);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
-export const getCategories: RequestHandler = (_req, res) => {
-  res.json(categories);
+export const getCategories: RequestHandler = async (_req, res) => {
+  try {
+    const categories = await prisma.category.findMany({
+      orderBy: { slug: "asc" },
+      include: { _count: { select: { products: true } } },
+    });
+    res.json(
+      categories.map((c) => ({
+        id: c.slug,
+        name: c.name,
+        slug: c.slug,
+        description: c.description ?? "",
+        image: c.image ?? undefined,
+        productCount: c._count.products,
+      }))
+    );
+  } catch (e) {
+    console.error("getCategories", e);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const getFeaturedProducts: RequestHandler = async (_req, res) => {
+  try {
+    const list = await prisma.product.findMany({
+      where: { badge: { not: null } },
+      take: 8,
+      include: productInclude,
+    });
+    res.json({ products: list.map(productToApi), total: list.length });
+  } catch (e) {
+    console.error("getFeaturedProducts", e);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };

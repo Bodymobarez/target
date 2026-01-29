@@ -35,3 +35,36 @@ export interface AuthResponse {
 export interface MeResponse {
   user: AuthUser;
 }
+
+// ----- Orders -----
+export interface CreateOrderItem {
+  productId: string;
+  name: string;
+  price: number;
+  quantity: number;
+  image?: string;
+  color?: string;
+}
+
+export interface CreateOrderBody {
+  items: CreateOrderItem[];
+  subtotal: number;
+  shipping: number;
+  tax: number;
+  total: number;
+  currency?: string;
+  shippingAddress: Record<string, unknown>;
+  paymentMethod?: string;
+}
+
+export interface OrderResponse {
+  id: string;
+  status: string;
+  subtotal: number;
+  shipping: number;
+  tax: number;
+  total: number;
+  currency: string;
+  createdAt: string;
+  items: { productId: string; name: string; price: number; quantity: number; image?: string; color?: string }[];
+}

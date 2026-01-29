@@ -7,7 +7,7 @@
 3. Choose **GitHub** and authorize Netlify if needed.
 4. Select the repo: **Bodymobarez/target**.
 5. Netlify will use these settings from `netlify.toml`:
-   - **Build command:** `npm run build:client`
+   - **Build command:** `npm run build:client && npx prisma generate`
    - **Publish directory:** `dist/spa`
    - **Functions:** `netlify/functions`
 6. Click **Deploy site**.
@@ -43,8 +43,13 @@ netlify deploy --prod
 
 ## Environment variables
 
-If you use **Neon** or other secrets, add them in Netlify:
+For **login and registration** to work on Netlify, set one of:
 
-**Site settings** → **Environment variables** → **Add variable** (e.g. `DATABASE_URL`).
+- **DATABASE_URL** — Your Neon (or other) PostgreSQL connection string, or  
+- **NETLIFY_DATABASE_URL** — Same value; the app uses it as a fallback for `DATABASE_URL`.
+
+**Site settings** → **Environment variables** → Add `DATABASE_URL` or `NETLIFY_DATABASE_URL` with your connection string.
+
+Without either variable, the auth API will return 503 and you can use the demo account: **admin@target.com** / **admin123**.
 
 Do not commit `.env`; it is gitignored.
