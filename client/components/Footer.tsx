@@ -79,8 +79,28 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link to="/products?category=macbook" className="hover:text-foreground smooth-transition">
-                  {t("nav.macbook")}
+                <Link to="/products?category=macbook-m4" className="hover:text-foreground smooth-transition">
+                  {t("nav.mac")}
+                </Link>
+              </li>
+              <li>
+                <Link to="/products?category=imac" className="hover:text-foreground smooth-transition">
+                  {t("nav.imac")}
+                </Link>
+              </li>
+              <li>
+                <Link to="/products?category=mac-mini" className="hover:text-foreground smooth-transition">
+                  {t("nav.macMini")}
+                </Link>
+              </li>
+              <li>
+                <Link to="/products?category=mac-studio" className="hover:text-foreground smooth-transition">
+                  {t("nav.macStudio")}
+                </Link>
+              </li>
+              <li>
+                <Link to="/products?category=mac-pro" className="hover:text-foreground smooth-transition">
+                  {t("nav.macPro")}
                 </Link>
               </li>
             </ul>

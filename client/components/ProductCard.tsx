@@ -51,14 +51,24 @@ export default function ProductCard({ product, className, compact }: ProductCard
             alt={product.name}
             className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
           />
-          {product.badge && (
-            <span className={cn(
-              "absolute left-2 top-2 sm:left-4 sm:top-4 px-2 py-0.5 sm:px-3 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-semibold bg-primary text-primary-foreground shadow-lg",
-              compact && "left-2 top-2 px-2 py-0.5 text-[10px]"
-            )}>
-              {product.badge}
-            </span>
-          )}
+          <div className="absolute left-2 top-2 sm:left-4 sm:top-4 flex flex-wrap gap-1.5">
+            {product.badge && (
+              <span className={cn(
+                "px-2 py-0.5 sm:px-3 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-semibold bg-primary text-primary-foreground shadow-lg",
+                compact && "px-2 py-0.5 text-[10px]"
+              )}>
+                {product.badge}
+              </span>
+            )}
+            {product.condition === "USED" && (
+              <span className={cn(
+                "px-2 py-0.5 sm:px-3 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-semibold bg-amber-600 text-white shadow-lg",
+                compact && "px-2 py-0.5 text-[10px]"
+              )}>
+                {t("products.conditionUsed")}
+              </span>
+            )}
+          </div>
           <div className={cn(
             "absolute right-2 top-2 sm:right-4 sm:top-4 flex flex-col gap-1 sm:gap-2",
             compact && "right-2 top-2 gap-1"
@@ -103,6 +113,9 @@ export default function ProductCard({ product, className, compact }: ProductCard
             compact ? "text-[10px] sm:text-xs mb-0.5 sm:mb-1" : "text-xs mb-2"
           )}>
             {product.categoryName}
+            {product.subcategory && (
+              <span className="normal-case font-normal opacity-90"> · {product.subcategory}</span>
+            )}
           </p>
           <h3 className={cn(
             "font-semibold group-hover:text-primary/90 transition-colors duration-300",

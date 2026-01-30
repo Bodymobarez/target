@@ -11,6 +11,8 @@ function productToApi(p: {
   id: string;
   slug: string;
   name: string;
+  subcategory: string | null;
+  condition: string | null;
   categoryId: string;
   category: { slug: string; name: string };
   description: string;
@@ -31,6 +33,8 @@ function productToApi(p: {
     id: p.id,
     slug: p.slug,
     name: p.name,
+    subcategory: p.subcategory ?? undefined,
+    condition: (p.condition === "USED" ? "USED" : "NEW") as "NEW" | "USED",
     categoryId: p.category.slug,
     categoryName: p.category.name,
     description: p.description,
@@ -59,9 +63,11 @@ const productInclude = {
 export const getProducts: RequestHandler = async (req, res) => {
   try {
     const categorySlug = req.query.category as string | undefined;
+    const conditionParam = req.query.condition as string | undefined; // NEW | USED
     const q = (req.query.q as string)?.trim()?.toLowerCase();
-    const where: { category?: { slug: string }; OR?: unknown[] } = {};
+    const where: { category?: { slug: string }; condition?: string; OR?: unknown[] } = {};
     if (categorySlug) where.category = { slug: categorySlug };
+    if (conditionParam === "USED" || conditionParam === "NEW") where.condition = conditionParam;
     if (q) where.OR = [{ name: { contains: q, mode: "insensitive" as const } }, { slug: { contains: q, mode: "insensitive" as const } }];
     const list = await prisma.product.findMany({
       where,

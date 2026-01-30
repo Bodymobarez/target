@@ -5,8 +5,15 @@
 export type ProductCategoryId =
   | "iphone"
   | "ipad"
-  | "macbook"
+  | "macbook-m1"
+  | "macbook-m2"
+  | "macbook-m3"
+  | "macbook-m4"
+  | "macbook-m5"
   | "imac"
+  | "mac-mini"
+  | "mac-studio"
+  | "mac-pro"
   | "watch"
   | "airpods"
   | "appletv"
@@ -23,6 +30,9 @@ export interface ProductColor {
   hex: string;
 }
 
+/** Product condition: New or Used */
+export type ProductCondition = "NEW" | "USED";
+
 export interface Product {
   id: string;
   slug: string;
@@ -30,6 +40,8 @@ export interface Product {
   categoryId: ProductCategoryId;
   categoryName: string;
   subcategory?: string;
+  /** NEW = جديد، USED = مستعمل */
+  condition?: ProductCondition;
   description: string;
   shortDescription: string;
   price: number;
@@ -83,4 +95,39 @@ export interface User {
   email: string;
   name?: string;
   role: "customer" | "admin" | "vendor";
+}
+
+/** Per-section design & content (controlled from backend) */
+export interface SectionConfig {
+  title?: string;
+  subtitle?: string;
+  primaryButtonText?: string;
+  secondaryButtonText?: string;
+  placeholder?: string;
+  buttonText?: string;
+  backgroundColor?: string;
+  backgroundImage?: string;
+  textColor?: string;
+  accentColor?: string;
+  paddingTop?: string;
+  paddingBottom?: string;
+  /** Hero: slide image URLs (one per line or array) */
+  slideImages?: string[] | string;
+  /** Featured: max products to show */
+  maxItems?: number;
+}
+
+/** Home layout section with optional design/content config */
+export interface HomeLayoutSection {
+  id: string;
+  enabled: boolean;
+  order: number;
+  config?: SectionConfig;
+}
+
+/** Global site theme (colors, font) */
+export interface SiteTheme {
+  primaryColor?: string;
+  accentColor?: string;
+  fontFamily?: string;
 }

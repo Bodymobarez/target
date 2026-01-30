@@ -13,6 +13,8 @@ import {
   ShoppingBag,
   FileText,
   PackageCheck,
+  Warehouse,
+  PackageSearch,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
@@ -23,6 +25,8 @@ const navKeys = [
   { to: "/admin/suppliers", labelKey: "admin.suppliers", icon: Truck },
   { to: "/admin/purchases", labelKey: "admin.purchases", icon: ShoppingBag },
   { to: "/admin/orders", labelKey: "admin.sales", icon: ShoppingCart },
+  { to: "/admin/warehouses", labelKey: "admin.warehouses", icon: Warehouse },
+  { to: "/admin/disbursements", labelKey: "admin.disbursements", icon: PackageSearch },
   { to: "/admin/invoices", labelKey: "admin.invoices", icon: FileText },
   { to: "/admin/delivery", labelKey: "admin.delivery", icon: PackageCheck },
   { to: "/admin/users", labelKey: "admin.users", icon: Users },

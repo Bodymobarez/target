@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Table,
@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, Eye, Truck, Plus, Pencil, Trash2 } from "lucide-react";
+import { Search, Eye, Truck, Plus, Pencil, Trash2, Banknote, Package } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/context/LanguageContext";
 import {
@@ -30,24 +30,47 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
+import { useAuth } from "@/context/AuthContext";
+import { toast } from "sonner";
 
 type OrderRow = {
   id: string;
   customer: string;
+  phone?: string;
   total: number;
+  currency: string;
   status: string;
+  rawStatus?: string;
   date: string;
   tracking: string | null;
+  paidAt?: string | null;
+  shippingAddress?: { address?: string; governorate?: string; phone?: string };
+  items?: { productId: string; name: string; price: number; quantity: number }[];
+  disbursement?: {
+    id: string;
+    warehouseName: string;
+    warehouseCode: string;
+    status: string;
+    completedAt?: string | null;
+  } | null;
 };
 
 const statusOptions = ["pending", "processing", "shipped", "delivered", "cancelled"] as const;
 
-const initialOrders: OrderRow[] = [
-  { id: "ORD-2847", customer: "John Doe", total: 1199, status: "shipped", date: "2025-01-29", tracking: "1Z999AA10123456784" },
-  { id: "ORD-2846", customer: "Jane Smith", total: 249, status: "delivered", date: "2025-01-28", tracking: "1Z999AA10123456785" },
-  { id: "ORD-2845", customer: "Ahmed Ali", total: 3499, status: "processing", date: "2025-01-28", tracking: null },
-  { id: "ORD-2844", customer: "Sara Lee", total: 799, status: "pending", date: "2025-01-27", tracking: null },
-];
+function apiStatusToRow(s: string): string {
+  const map: Record<string, string> = {
+    PENDING: "pending",
+    CONFIRMED: "confirmed",
+    PROCESSING: "processing",
+    SHIPPED: "shipped",
+    DELIVERED: "delivered",
+    CANCELLED: "cancelled",
+    REFUNDED: "cancelled",
+  };
+  return map[s] ?? s.toLowerCase();
+}
+
+const initialOrders: OrderRow[] = [];
 
 const statusColors: Record<string, string> = {
   pending: "bg-amber-500/20 text-amber-700 dark:text-amber-400",
@@ -55,6 +78,7 @@ const statusColors: Record<string, string> = {
   shipped: "bg-purple-500/20 text-purple-700 dark:text-purple-400",
   delivered: "bg-green-500/20 text-green-700 dark:text-green-400",
   cancelled: "bg-red-500/20 text-red-700 dark:text-red-400",
+  confirmed: "bg-green-500/20 text-green-700 dark:text-green-400",
 };
 
 const statusLabel: Record<string, string> = {
@@ -63,17 +87,25 @@ const statusLabel: Record<string, string> = {
   shipped: "admin.shipped",
   delivered: "admin.delivered",
   cancelled: "admin.cancelled",
+  confirmed: "admin.confirmed",
 };
 
 export default function AdminOrders() {
-  const { t, formatPriceFromUsd } = useLanguage();
+  const { t, formatPrice, formatPriceFromUsd } = useLanguage();
+  const { token } = useAuth();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
+  const [markingPaidId, setMarkingPaidId] = useState<string | null>(null);
   const [list, setList] = useState<OrderRow[]>(initialOrders);
+  const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [viewOrder, setViewOrder] = useState<OrderRow | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [disbursementOrderId, setDisbursementOrderId] = useState<string | null>(null);
+  const [warehouses, setWarehouses] = useState<{ id: string; name: string; code: string }[]>([]);
+  const [selectedWarehouseId, setSelectedWarehouseId] = useState("");
+  const [creatingDisbursement, setCreatingDisbursement] = useState(false);
   const [form, setForm] = useState({
     customer: "",
     total: "",
@@ -81,6 +113,36 @@ export default function AdminOrders() {
     date: new Date().toISOString().slice(0, 10),
     tracking: "",
   });
+
+  useEffect(() => {
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+    fetch("/api/orders/all", { headers: { Authorization: `Bearer ${token}` } })
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data: OrderRow[]) => {
+        setList(
+          (Array.isArray(data) ? data : []).map((o: OrderRow & { rawStatus?: string; disbursement?: unknown }) => ({
+            id: o.id,
+            customer: o.customer,
+            phone: o.phone,
+            total: o.total,
+            currency: o.currency ?? "EGP",
+            status: apiStatusToRow(o.status),
+            rawStatus: o.status,
+            date: (o as { date?: string }).date?.slice(0, 10) ?? "",
+            tracking: o.tracking ?? null,
+            paidAt: (o as { paidAt?: string }).paidAt,
+            shippingAddress: (o as { shippingAddress?: OrderRow["shippingAddress"] }).shippingAddress,
+            items: (o as { items?: OrderRow["items"] }).items,
+            disbursement: (o as { disbursement?: OrderRow["disbursement"] }).disbursement,
+          }))
+        );
+      })
+      .catch(() => setList(initialOrders))
+      .finally(() => setLoading(false));
+  }, [token]);
 
   const filtered = list.filter(
     (o) =>
@@ -151,6 +213,88 @@ export default function AdminOrders() {
   const handleDelete = (id: string) => {
     setList((prev) => prev.filter((o) => o.id !== id));
     setDeleteId(null);
+    if (viewOrder?.id === id) setViewOrder(null);
+  };
+
+  const handleMarkPaid = async (orderId: string) => {
+    if (!token) return;
+    setMarkingPaidId(orderId);
+    try {
+      const res = await fetch(`/api/orders/${orderId}/paid`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        toast.error(data?.message ?? t("error"));
+        return;
+      }
+      setList((prev) => prev.map((o) => (o.id === orderId ? { ...o, status: "confirmed" as const, rawStatus: "CONFIRMED" } : o)));
+      if (viewOrder?.id === orderId) setViewOrder((v) => (v ? { ...v, status: "confirmed" } : null));
+      toast.success(data?.message ?? (t("admin.paidConfirmed") || "Payment confirmed."));
+      if (data?.customerPhone) {
+        toast.info((t("admin.notifyCustomerWhatsApp") || "Notify customer on WhatsApp:") + " " + data.customerPhone);
+      }
+    } catch {
+      toast.error(t("error"));
+    } finally {
+      setMarkingPaidId(null);
+    }
+  };
+
+  const openDisbursement = (orderId: string) => {
+    setDisbursementOrderId(orderId);
+    setSelectedWarehouseId("");
+    if (token) {
+      fetch("/api/warehouses", { headers: { Authorization: `Bearer ${token}` } })
+        .then((res) => (res.ok ? res.json() : []))
+        .then((data: { id: string; name: string; code: string }[]) => setWarehouses(Array.isArray(data) ? data : []))
+        .catch(() => setWarehouses([]));
+    }
+  };
+
+  const handleCreateDisbursement = async () => {
+    if (!token || !disbursementOrderId || !selectedWarehouseId) return;
+    setCreatingDisbursement(true);
+    try {
+      const res = await fetch("/api/disbursements", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ orderId: disbursementOrderId, warehouseId: selectedWarehouseId }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        toast.error(data?.message ?? t("error"));
+        return;
+      }
+      toast.success(t("admin.disbursementCreated"));
+      setDisbursementOrderId(null);
+      fetch("/api/orders/all", { headers: { Authorization: `Bearer ${token}` } })
+        .then((r) => (r.ok ? r.json() : []))
+        .then((data: (OrderRow & { status?: string; date?: string; paidAt?: string; disbursement?: OrderRow["disbursement"] })[]) => {
+          setList(
+            (Array.isArray(data) ? data : []).map((o) => ({
+              id: o.id,
+              customer: o.customer,
+              phone: o.phone,
+              total: o.total,
+              currency: o.currency ?? "EGP",
+              status: apiStatusToRow(o.status ?? o.rawStatus ?? ""),
+              rawStatus: o.status ?? o.rawStatus,
+              date: (o.date ?? "").toString().slice(0, 10),
+              tracking: o.tracking ?? null,
+              paidAt: o.paidAt,
+              shippingAddress: o.shippingAddress,
+              items: o.items,
+              disbursement: o.disbursement,
+            }))
+          );
+        });
+    } catch {
+      toast.error(t("error"));
+    } finally {
+      setCreatingDisbursement(false);
+    }
   };
 
   return (
@@ -260,12 +404,25 @@ export default function AdminOrders() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filtered.map((order) => (
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                  {t("loading")}
+                </TableCell>
+              </TableRow>
+            ) : filtered.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                  {t("admin.noOrders")}
+                </TableCell>
+              </TableRow>
+            ) : (
+            filtered.map((order) => (
               <TableRow key={order.id}>
                 <TableCell className="font-mono font-medium">{order.id}</TableCell>
                 <TableCell>{order.customer}</TableCell>
                 <TableCell>{order.date}</TableCell>
-                <TableCell>{formatPriceFromUsd(order.total)}</TableCell>
+                <TableCell>{order.currency === "EGP" ? formatPrice(order.total) : formatPriceFromUsd(order.total)}</TableCell>
                 <TableCell>
                   <Badge className={statusColors[order.status] ?? "bg-secondary"}>
                     {statusLabel[order.status] ? t(statusLabel[order.status]) : order.status}
@@ -281,6 +438,25 @@ export default function AdminOrders() {
                     >
                       <Eye className="w-4 h-4" />
                     </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      title={t("admin.markPaid")}
+                      disabled={markingPaidId === order.id || order.status === "delivered" || order.status === "confirmed"}
+                      onClick={() => handleMarkPaid(order.id)}
+                    >
+                      <Banknote className="w-4 h-4" />
+                    </Button>
+                    {order.rawStatus === "CONFIRMED" && !order.disbursement && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        title={t("admin.sendToWarehouse")}
+                        onClick={() => openDisbursement(order.id)}
+                      >
+                        <Package className="w-4 h-4" />
+                      </Button>
+                    )}
                     <Button
                       variant="ghost"
                       size="icon"
@@ -301,7 +477,8 @@ export default function AdminOrders() {
                   </div>
                 </TableCell>
               </TableRow>
-            ))}
+            ))
+            )}
           </TableBody>
         </Table>
       </div>
@@ -315,12 +492,37 @@ export default function AdminOrders() {
           {viewOrder && (
             <div className="grid gap-3 py-2">
               <p><span className="font-medium">{t("admin.customer")}:</span> {viewOrder.customer}</p>
+              {viewOrder.phone && (
+                <p><span className="font-medium">{t("phone")}:</span> {viewOrder.phone}</p>
+              )}
+              {viewOrder.shippingAddress?.address && (
+                <p><span className="font-medium">{t("checkout.address")}:</span> {viewOrder.shippingAddress.address}</p>
+              )}
+              {viewOrder.shippingAddress?.governorate && (
+                <p><span className="font-medium">{t("checkout.governorate")}:</span> {viewOrder.shippingAddress.governorate}</p>
+              )}
               <p><span className="font-medium">{t("admin.date")}:</span> {viewOrder.date}</p>
-              <p><span className="font-medium">{t("total")}:</span> {formatPriceFromUsd(viewOrder.total)}</p>
+              <p><span className="font-medium">{t("total")}:</span> {viewOrder.currency === "EGP" ? formatPrice(viewOrder.total) : formatPriceFromUsd(viewOrder.total)}</p>
               <p>
                 <span className="font-medium">{t("admin.status")}:</span>{" "}
                 {statusLabel[viewOrder.status] ? t(statusLabel[viewOrder.status]) : viewOrder.status}
               </p>
+              {viewOrder.disbursement && (
+                <p>
+                  <span className="font-medium">{t("admin.disbursement")}:</span>{" "}
+                  {viewOrder.disbursement.warehouseName} ({viewOrder.disbursement.warehouseCode}) — {viewOrder.disbursement.status}
+                </p>
+              )}
+              {viewOrder.items && viewOrder.items.length > 0 && (
+                <div className="border-t pt-3 mt-2">
+                  <p className="font-medium mb-2">{t("admin.items")}</p>
+                  <ul className="text-sm space-y-1">
+                    {viewOrder.items.map((item, i) => (
+                      <li key={i}>{item.name} × {item.quantity}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
               {viewOrder.tracking && (
                 <p><span className="font-medium">{t("admin.trackingNumber")}:</span> {viewOrder.tracking}</p>
               )}
@@ -346,6 +548,37 @@ export default function AdminOrders() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={!!disbursementOrderId} onOpenChange={() => !creatingDisbursement && setDisbursementOrderId(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t("admin.sendToWarehouse")}</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label>{t("admin.warehouse")}</Label>
+              <select
+                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm"
+                value={selectedWarehouseId}
+                onChange={(e) => setSelectedWarehouseId(e.target.value)}
+              >
+                <option value="">{t("admin.selectWarehouse")}</option>
+                {warehouses.map((w) => (
+                  <option key={w.id} value={w.id}>{w.name} ({w.code})</option>
+                ))}
+              </select>
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" onClick={() => setDisbursementOrderId(null)} disabled={creatingDisbursement}>
+                {t("cancel")}
+              </Button>
+              <Button onClick={handleCreateDisbursement} disabled={!selectedWarehouseId || creatingDisbursement}>
+                {creatingDisbursement ? t("loading") : t("admin.createDisbursement")}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

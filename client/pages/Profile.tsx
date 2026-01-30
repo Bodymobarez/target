@@ -173,6 +173,14 @@ export default function Profile() {
                         </div>
                       ))}
                     </div>
+                    {order.status === "PENDING" && (
+                      <Link
+                        to={`/payment/${order.id}`}
+                        className="inline-flex items-center gap-2 mt-4 py-2 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:opacity-90"
+                      >
+                        {t("paymentPage.followUpPayment")}
+                      </Link>
+                    )}
                     {order.trackingNumber && (
                       <div className="flex items-center gap-2 pt-4 border-t border-border">
                         <Truck className="w-4 h-4 text-muted-foreground" />

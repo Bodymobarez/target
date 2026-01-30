@@ -17,6 +17,7 @@ import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
+import Payment from "./pages/Payment";
 import Profile from "./pages/Profile";
 import Wishlist from "./pages/Wishlist";
 import Compare from "./pages/Compare";
@@ -27,6 +28,8 @@ import AdminLayout from "./pages/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProducts from "./pages/admin/AdminProducts";
 import AdminOrders from "./pages/admin/AdminOrders";
+import AdminWarehouses from "./pages/admin/AdminWarehouses";
+import AdminDisbursements from "./pages/admin/AdminDisbursements";
 import AdminSuppliers from "./pages/admin/AdminSuppliers";
 import AdminPurchases from "./pages/admin/AdminPurchases";
 import AdminInvoices from "./pages/admin/AdminInvoices";
@@ -71,6 +74,8 @@ export default function App() {
                         <Route path="suppliers" element={<AdminSuppliers />} />
                         <Route path="purchases" element={<AdminPurchases />} />
                         <Route path="orders" element={<AdminOrders />} />
+                        <Route path="warehouses" element={<AdminWarehouses />} />
+                        <Route path="disbursements" element={<AdminDisbursements />} />
                         <Route path="invoices" element={<AdminInvoices />} />
                         <Route path="delivery" element={<AdminDelivery />} />
                         <Route path="users" element={<AdminUsers />} />
@@ -83,6 +88,7 @@ export default function App() {
                         <Route path="/product/:id" element={<ProductDetail />} />
                         <Route path="/cart" element={<Cart />} />
                         <Route path="/checkout" element={<Checkout />} />
+                        <Route path="/payment/:orderId" element={<Payment />} />
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/wishlist" element={<Wishlist />} />
                         <Route path="/compare" element={<Compare />} />

@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { products as initialProducts, categories } from "@/data/mockProducts";
 import type { Product } from "@shared/types";
 import { useLanguage } from "@/context/LanguageContext";
-import { Plus, Pencil, Trash2, Search } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { Plus, Pencil, Trash2, Search, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -31,6 +32,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 
 type AdminProduct = Product & { sku?: string; stockQuantity?: number };
 
@@ -42,8 +44,11 @@ const toSlug = (s: string) =>
 
 export default function AdminProducts() {
   const { t, formatPriceFromUsd } = useLanguage();
+  const { token } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [list, setList] = useState<AdminProduct[]>(() =>
     initialProducts.map((p) => ({
       ...p,
@@ -58,6 +63,7 @@ export default function AdminProducts() {
     price: "",
     categoryId: "iphone",
     categoryName: "iPhone",
+    condition: "NEW" as "NEW" | "USED",
     sku: "",
     stockQuantity: "0",
     description: "",
@@ -77,6 +83,7 @@ export default function AdminProducts() {
       price: "",
       categoryId: "iphone",
       categoryName: categories[0].name,
+      condition: "NEW",
       sku: "",
       stockQuantity: "0",
       description: "",
@@ -92,6 +99,7 @@ export default function AdminProducts() {
       price: String(p.price),
       categoryId: p.categoryId,
       categoryName: p.categoryName,
+      condition: p.condition === "USED" ? "USED" : "NEW",
       sku: p.sku ?? "",
       stockQuantity: String(p.stockQuantity ?? 0),
       description: p.description ?? "",
@@ -103,6 +111,44 @@ export default function AdminProducts() {
   const openAddDialog = () => {
     openAdd();
     setOpen(true);
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !token) return;
+    if (!/^image\/(jpeg|png|gif|webp)$/i.test(file.type)) {
+      toast.error(t("admin.uploadImageOnly") ?? "Only JPEG, PNG, GIF or WebP images");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error(t("admin.uploadMaxSize") ?? "Max size 5MB");
+      return;
+    }
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        toast.error(data?.message ?? t("error"));
+        return;
+      }
+      if (data.url) {
+        setForm((f) => ({ ...f, imageUrl: data.url }));
+        toast.success(t("admin.imageUploaded") ?? "Image uploaded");
+      }
+    } catch {
+      toast.error(t("error"));
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+      fileInputRef.current?.value && (fileInputRef.current.value = "");
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -122,6 +168,7 @@ export default function AdminProducts() {
                 price,
                 categoryId: category.id,
                 categoryName: category.name,
+                condition: form.condition,
                 sku: form.sku || undefined,
                 stockQuantity,
                 description: form.description,
@@ -140,6 +187,7 @@ export default function AdminProducts() {
         name: form.name,
         categoryId: category.id,
         categoryName: category.name,
+        condition: form.condition,
         description: form.description,
         shortDescription: form.description.slice(0, 80),
         price,
@@ -251,6 +299,20 @@ export default function AdminProducts() {
                   </select>
                 </div>
                 <div className="grid gap-2">
+                  <Label htmlFor="condition">{t("admin.columnCondition")}</Label>
+                  <select
+                    id="condition"
+                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors"
+                    value={form.condition}
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, condition: e.target.value as "NEW" | "USED" }))
+                    }
+                  >
+                    <option value="NEW">{t("products.conditionNew")}</option>
+                    <option value="USED">{t("products.conditionUsed")}</option>
+                  </select>
+                </div>
+                <div className="grid gap-2">
                   <Label htmlFor="sku">{t("admin.columnSKU")}</Label>
                   <Input
                     id="sku"
@@ -273,15 +335,45 @@ export default function AdminProducts() {
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="imageUrl">{t("admin.imageUrl")}</Label>
-                  <Input
-                    id="imageUrl"
-                    type="url"
-                    value={form.imageUrl}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, imageUrl: e.target.value }))
-                    }
-                    placeholder="https://..."
-                  />
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Input
+                      id="imageUrl"
+                      type="url"
+                      value={form.imageUrl}
+                      onChange={(e) =>
+                        setForm((f) => ({ ...f, imageUrl: e.target.value }))
+                      }
+                      placeholder="https://... أو ارفع صورة"
+                      className="flex-1"
+                    />
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/gif,image/webp"
+                      className="hidden"
+                      onChange={handleImageUpload}
+                      disabled={uploading}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="gap-2 shrink-0"
+                      disabled={uploading}
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <Upload className="w-4 h-4" />
+                      {uploading ? t("loading") : (t("admin.uploadImage") ?? "رفع صورة")}
+                    </Button>
+                  </div>
+                  {form.imageUrl && (
+                    <div className="mt-2">
+                      <img
+                        src={form.imageUrl}
+                        alt=""
+                        className="w-20 h-20 rounded-lg object-cover border border-border"
+                      />
+                    </div>
+                  )}
                 </div>
                 <div className="flex justify-end gap-2 pt-2">
                   <Button
@@ -306,6 +398,7 @@ export default function AdminProducts() {
               <TableHead className="w-14">{t("admin.columnImage")}</TableHead>
               <TableHead>{t("admin.columnName")}</TableHead>
               <TableHead>{t("admin.columnCategory")}</TableHead>
+              <TableHead>{t("admin.columnCondition")}</TableHead>
               <TableHead>{t("admin.columnSKU")}</TableHead>
               <TableHead>{t("admin.columnPrice")}</TableHead>
               <TableHead>{t("admin.columnStock")}</TableHead>
@@ -325,6 +418,11 @@ export default function AdminProducts() {
                 </TableCell>
                 <TableCell className="font-medium">{product.name}</TableCell>
                 <TableCell>{product.categoryName}</TableCell>
+                <TableCell>
+                  <span className={product.condition === "USED" ? "text-amber-600 font-medium" : ""}>
+                    {product.condition === "USED" ? t("products.conditionUsed") : t("products.conditionNew")}
+                  </span>
+                </TableCell>
                 <TableCell className="font-mono text-xs">
                   {product.sku ?? product.id}
                 </TableCell>

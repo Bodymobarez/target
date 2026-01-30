@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
@@ -13,7 +13,10 @@ const SHIPPING_COST_EGP = 50;
 const TAX_RATE = 0.1;
 type Step = "shipping" | "payment" | "review";
 
+const PHONE_REGEX = /^01[0125]\d{8}$/;
+
 export default function Checkout() {
+  const navigate = useNavigate();
   const { items, clearCart } = useCart();
   const { token } = useAuth();
   const { t, formatPrice, formatPriceFromUsd, locale } = useLanguage();
@@ -22,7 +25,7 @@ export default function Checkout() {
   const [selectedPaymentId, setSelectedPaymentId] = useState<string>("cod");
   const [placing, setPlacing] = useState(false);
   const [placeError, setPlaceError] = useState<string | null>(null);
-  const [shippingAddress, setShippingAddress] = useState({ fullName: "", email: "", address: "", governorate: "", zip: "" });
+  const [shippingAddress, setShippingAddress] = useState({ fullName: "", email: "", phone: "", address: "", governorate: "", zip: "" });
 
   const subtotalUsd = items.reduce((s, i) => s + i.price * i.quantity, 0);
   const subtotalEgp = items.reduce(
@@ -57,6 +60,7 @@ export default function Checkout() {
           currency: "EGP",
           shippingAddress: { ...shippingAddress, country: "Egypt" },
           paymentMethod: selectedPaymentId,
+          phone: shippingAddress.phone,
         }),
       });
       if (!res.ok) {
@@ -65,15 +69,16 @@ export default function Checkout() {
         setPlacing(false);
         return;
       }
-      setOrderPlaced(true);
+      const orderData = await res.json();
       clearCart();
+      navigate(`/payment/${orderData.id}`, { state: { order: orderData, shippingAddress } });
     } catch {
       setPlaceError(t("error"));
     }
     setPlacing(false);
   };
 
-  if (items.length === 0 && !orderPlaced) {
+  if (items.length === 0) {
     return (
       <div className="min-h-screen">
         <div className="container-apple py-20 text-center">
@@ -86,24 +91,10 @@ export default function Checkout() {
     );
   }
 
-  if (orderPlaced) {
-    return (
-      <div className="min-h-screen">
-        <div className="container-apple py-20 text-center max-w-xl mx-auto">
-          <div className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-6">
-            <Check className="w-10 h-10 text-green-600" />
-          </div>
-          <h1 className="text-3xl font-bold mb-4">{t("checkout.orderPlaced")}</h1>
-          <p className="text-muted-foreground mb-8">
-            {t("checkout.orderPlacedThanks")}
-          </p>
-          <Link to="/products" className="btn-primary">
-            {t("checkout.continueShopping")}
-          </Link>
-        </div>
-      </div>
-    );
-  }
+  const canGoToPayment =
+    shippingAddress.fullName.trim() &&
+    shippingAddress.email.trim() &&
+    PHONE_REGEX.test(shippingAddress.phone.trim());
 
   return (
     <div className="min-h-screen">
@@ -166,6 +157,13 @@ export default function Checkout() {
                       className="w-full px-4 py-3 rounded-xl border border-border bg-background"
                     />
                     <input
+                      type="tel"
+                      placeholder={t("checkout.phone")}
+                      value={shippingAddress.phone}
+                      onChange={(e) => setShippingAddress((s) => ({ ...s, phone: e.target.value }))}
+                      className="w-full px-4 py-3 rounded-xl border border-border bg-background"
+                    />
+                    <input
                       type="text"
                       placeholder={t("checkout.address")}
                       value={shippingAddress.address}
@@ -189,10 +187,16 @@ export default function Checkout() {
                       />
                     </div>
                   </div>
+                  {!canGoToPayment && (
+                    <p className="text-sm text-amber-600 mt-2">
+                      {t("checkout.phoneRequired")}
+                    </p>
+                  )}
                   <button
                     type="button"
-                    onClick={() => setStep("payment")}
-                    className="btn-primary mt-6 flex items-center gap-2"
+                    onClick={() => canGoToPayment && setStep("payment")}
+                    disabled={!canGoToPayment}
+                    className="btn-primary mt-6 flex items-center gap-2 disabled:opacity-60"
                   >
                     {t("checkout.continueToPayment")}
                     <ArrowRight className="w-5 h-5" />

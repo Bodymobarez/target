@@ -143,6 +143,12 @@ export default function ProductDetail() {
             <div>
               <p className="text-sm text-muted-foreground mb-2">
                 {product.categoryName}
+                {product.subcategory && ` · ${product.subcategory}`}
+                {product.condition === "USED" && (
+                  <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200">
+                    {t("products.conditionUsed")}
+                  </span>
+                )}
               </p>
               <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4">
                 {product.name}

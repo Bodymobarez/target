@@ -8,6 +8,10 @@
    * Ultra-sharp • Layered depth • Retina glass • Premium contrast
    */
   :root {
+    /* Backend-controlled theme (set via API) — فارغ = استخدام القيم الافتراضية */
+    --theme-primary: initial;
+    --theme-accent: initial;
+    --theme-font: initial;
     /* Logo colors — ذهبي وأسود */
     --logo-gold: 43 96% 48%;
     --logo-gold-light: 43 70% 58%;

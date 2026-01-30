@@ -27,3 +27,10 @@ dist-ssr
 .env
 .env.local
 .env.*.local
+
+# Uploaded product images (optional: keep if you want to track them)
+public/uploads
+
+# Vite cache
+vite.config.ts.timestamp-*
+*.timestamp-*.mjs

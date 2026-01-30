@@ -59,7 +59,7 @@ export default function Header() {
   const navLinks = [
     { label: t("nav.iphone"), href: "/products?category=iphone" },
     { label: t("nav.ipad"), href: "/products?category=ipad" },
-    { label: t("nav.macbook"), href: "/products?category=macbook" },
+    { label: t("nav.mac"), href: "/products?category=macbook-m4" },
     { label: t("nav.accessories"), href: "/products?category=accessories" },
     { label: t("nav.repair"), href: "/repair", icon: Wrench },
   ];

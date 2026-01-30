@@ -1,5 +1,5 @@
 [build]
-  command = "npm run build:client && npx prisma generate"
+  command = "npm run build:client && npx prisma generate && (export DATABASE_URL=\"${NETLIFY_DATABASE_URL:-$DATABASE_URL}\" && npx prisma db push --skip-generate && npx prisma db seed)"
   functions = "netlify/functions"
   publish = "dist/spa"
 
